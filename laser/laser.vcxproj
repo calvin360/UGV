@@ -20,12 +20,11 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{D050997E-CD03-47CF-B534-A631C5222DF5}</ProjectGuid>
+    <ProjectGuid>{ACD87187-A167-4692-95AB-EBBEAAC46CCA}</ProjectGuid>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
-    <RootNamespace>Display</RootNamespace>
+    <RootNamespace>laser</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>display</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -79,11 +78,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>GLU32.LIB;glut32.lib;jpeg.lib;jpeg-static.lib;libzmq-v120-mt-gd-4_0_4.lib;OPENGL32.LIB;turbojpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies />
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -114,31 +111,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.hpp" />
-    <ClInclude Include="Frustum.hpp" />
-    <ClInclude Include="Ground.hpp" />
-    <ClInclude Include="HUD.hpp" />
-    <ClInclude Include="KeyManager.hpp" />
-    <ClInclude Include="Messages.hpp" />
-    <ClInclude Include="MyVehicle.hpp" />
-    <ClInclude Include="Quaternion.hpp" />
-    <ClInclude Include="Shape.hpp" />
-    <ClInclude Include="VectorMaths.hpp" />
-    <ClInclude Include="Vehicle.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Frustum.cpp" />
-    <ClCompile Include="Ground.cpp" />
-    <ClCompile Include="HUD.cpp" />
-    <ClCompile Include="KeyManager.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Messages.cpp" />
-    <ClCompile Include="MyVehicle.cpp" />
-    <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="Shape.cpp" />
-    <ClCompile Include="VectorMaths.cpp" />
-    <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
