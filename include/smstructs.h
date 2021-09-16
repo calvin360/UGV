@@ -19,6 +19,7 @@ using namespace System::Text;
 
 #define STANDARD_LASER_LENGTH 361
 
+
 struct SM_Laser
 {
 	double x[STANDARD_LASER_LENGTH];

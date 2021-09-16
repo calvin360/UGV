@@ -11,11 +11,19 @@
 #include "SMObject.h"
 
 using namespace System;
+using namespace System::Diagnostics;
 using namespace System::Net::Sockets;
 using namespace System::Net;
 using namespace System::Text;
 
-#define NUM_UNITS 3
+#define NUM_UNITS 1
+
+struct timeStamps {
+	double GPSTimeStamp;
+	double IMUTimeStamp;
+	double laserTimeStamp;
+	double PMTimeStamp;
+};
 
 bool IsProcessRunning(const char* processName);
 void StartProcesses();
@@ -34,8 +42,24 @@ TCHAR Units[10][20] = //
 
 int main()
 {
+	//setup shared memory
+	SMObject PMObj(_TEXT("PMObj"), sizeof(timeStamps));//declaring SM
+	timeStamps *timeStampsSMPtr;
+	PMObj.SMCreate();
+	PMObj.SMAccess();
+	timeStampsSMPtr = (timeStamps*)PMObj.pData;
+
+	timeStampsSMPtr->PMTimeStamp = (double)Stopwatch::GetTimestamp();
+	
 	//start all 5 modules
 	StartProcesses();
+	while (1){
+		timeStampsSMPtr->PMTimeStamp = 599.034;
+		Sleep(50);
+		if (_kbhit()) break;
+	}
+	Console::WriteLine("Process management terminated normally.");
+	Sleep(500);
 	return 0;
 }
 
