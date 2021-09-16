@@ -9,14 +9,16 @@ struct timeStamps {
 	double PMTimeStamp;
 };
 
+using namespace System;
+
 int main(void) {
 	SMObject PMObj(_TEXT("PMObj"), sizeof(timeStamps));//declaring SM
-	timeStamps* timeStampsSMPtr;
+	timeStamps *timeStampsSMPtr;
 	PMObj.SMAccess();
 	timeStampsSMPtr = (timeStamps*)PMObj.pData;
 
 	while (1) {
-		Console::WriteLine("time = {10:F3}", timeStampsSMPtr->PMTimeStamp);
+		Console::WriteLine(("{0:F3}"), timeStampsSMPtr->PMTimeStamp);
 		Sleep(5000);
 		if (_kbhit()) break;
 	}
