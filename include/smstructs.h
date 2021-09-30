@@ -19,6 +19,12 @@ using namespace System::Text;
 
 #define STANDARD_LASER_LENGTH 361
 
+struct timeStamps {
+	long long Camera;
+	long int Display;
+	long int Laser;
+	long long PM;
+};
 
 struct SM_Laser
 {
@@ -41,28 +47,27 @@ struct SM_GPS
 
 struct UnitFlags
 {
-	unsigned char	ProcessManagement : 1,	//NONCRITICAL
-					Laser : 1,				//NONCRITICAL
+	unsigned char	Laser : 1,				//CRITICAL
+					OpenGL : 1,				//CRITICAL
+					Camera : 1,				//CRITICAL
 					VehicleControl : 1,		//NONCRITICAL
 					GPS : 1,				//NONCRITICAL
-					OpenGL : 1,				//NONCRITICAL
-					Camera : 1,				//NONCRITICAL
-					Garbage : 2;
+					Garbage : 3;			//filler padding
 };
 
 union ExecFlags
 {
 	UnitFlags Flags;
-	unsigned short Status;
+	unsigned char Status;
 };
 
 struct ProcessManagement
 {
 	ExecFlags Heartbeat;
 	ExecFlags Shutdown;
-	long int LifeCounter;
+	long long LifeCounter; //long int
 };
 
-#define NONCRITICALMASK 0xff	//0 011 0000
-#define CRITICALMASK 0x0		//0 100 1111
+#define CRITICALMASK 0x03		//0100 1111//0011 0011 //assuming display is critical
+#define NONCRITICALMASK ~CRITICALMASK	//0011 0000 //assuming vehicle control is noncritical
 #endif
