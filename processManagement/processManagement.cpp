@@ -16,7 +16,7 @@ using namespace System::Net::Sockets;
 using namespace System::Net;
 using namespace System::Text;
 
-#define NUM_UNITS 3
+#define NUM_UNITS 1
 
 
 
@@ -27,12 +27,12 @@ void print(ProcessManagement* PMSMPtr);
 //defining start up sequence
 TCHAR Units[10][20] = //
 {
-	TEXT("GPS.exe"),
+TEXT("LASER.exe"),
+TEXT("GPS.exe"),
 TEXT("Camera.exe"),
 TEXT("Display.exe"),
-TEXT("LASER.exe"),
 TEXT("VehicleControl.exe"),
-TEXT("OpenGL.exe")
+TEXT("Display.exe")
 };
 
 int main()
@@ -42,8 +42,7 @@ int main()
 	tObj.SMCreate();
 	tObj.SMAccess();
 	timeStamps* timePtr = (timeStamps*)tObj.pData;
-	timePtr->PM = (long int)Stopwatch::GetTimestamp() / (long int)Stopwatch::Frequency;
-	/*array<String^>^ ModuleList = gcnew array<String^>{"ProcessManagement", "Laser", "OpenGL", "Camera", "VehicleControl", "GPS" };
+	/*array<String^>^ ModuleList = gcnew array<String^>{"ProcessManagement", "Laser", "Display", "Camera", "VehicleControl", "GPS" };
 	array<int^> Critcal = gcnew array<int>(ModuleList->Length) { 1, 1, 1, 1, 0, 0 };
 	array<Process^>^ processList = gcnew array<Process^>(ModuleList->Length);*/
 	//ProcessManagement* PMSMPtr = nullptr;
@@ -51,11 +50,58 @@ int main()
 	PMObj.SMCreate();
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
-	PMSMPtr->Heartbeat.Status = 0x02; 
-	PMSMPtr->LifeCounter = 1000;
+	PMSMPtr->Heartbeat.Status = 0x07; 
+	PMSMPtr->LifeCounter = 5;
 	//start all 5 modules
-	//StartProcesses();
+	StartProcesses();
+	Sleep(1000);
 	while (!_kbhit()) {
+		timePtr->Camera = timePtr->Display = timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
+		Console::WriteLine("PM time stamp    : {0,12:F3} {1,12:X8}", timePtr->PM, PMSMPtr->Shutdown.Status);
+		Console::WriteLine("Laser time stamp    : {0,12:F3} {1,12:X8}", timePtr->Laser, PMSMPtr->Shutdown.Status);
+		Console::WriteLine("Life    : {0,12:F3} {1,12:X8}", (timePtr->PM - timePtr->Laser), PMSMPtr->Shutdown.Status);
+		std::cout << PMSMPtr->LifeCounter << std::endl;
+		PMSMPtr->Heartbeat.Flags.Display = 1;
+		PMSMPtr->Heartbeat.Flags.Camera = 1;
+		Sleep(25);
+		//checking crit processes
+		if ((CRITICALMASK & PMSMPtr->Heartbeat.Status) == CRITICALMASK) {
+			PMSMPtr->Heartbeat.Flags.Laser = 0;
+			PMSMPtr->Heartbeat.Flags.Display = 0;
+			PMSMPtr->Heartbeat.Flags.Camera = 0;
+			Console::WriteLine("crit reset");
+		}
+		//kill all if any crit process has timed out
+		//((timePtr->PM - timePtr->Camera) || (timePtr->PM - timePtr->Display) || (timePtr->PM - timePtr->Laser)) > PMSMPtr->LifeCounter
+		else if ((timePtr->PM - timePtr->Camera > PMSMPtr->LifeCounter) || (timePtr->PM - timePtr->Display > PMSMPtr->LifeCounter) || (timePtr->PM - timePtr->Laser > PMSMPtr->LifeCounter)){
+			PMSMPtr->Shutdown.Status = 0xFF;
+			Console::WriteLine("Weeder shutdown {0,8:F8}", PMSMPtr->Shutdown.Status);
+			break;
+		}
+		if ((NONCRITICALMASK & PMSMPtr->Heartbeat.Status) == NONCRITICALMASK) {
+			PMSMPtr->Heartbeat.Flags.VehicleControl = 0;
+			PMSMPtr->Heartbeat.Flags.GPS = 0;
+		}
+		else if ((timePtr->Vehicle - timePtr->PM) > PMSMPtr->LifeCounter) {
+				if (IsProcessRunning("VehicleControl") == true) {
+				PMSMPtr->Shutdown.Status = 0x08;
+				Console::WriteLine("Vehicle Control Killed");
+			}
+			StartProcesses();
+			Console::WriteLine("Vehicle Control started");
+		}
+		else if ((timePtr->GPS - timePtr->PM) > PMSMPtr->LifeCounter) {
+			if (IsProcessRunning("GPS") == true) {
+				PMSMPtr->Shutdown.Status = 0x08;
+				Console::WriteLine("GPS Killed");
+			}
+			StartProcesses();
+			Console::WriteLine("GPS started");
+		}
+
+		if (PMSMPtr->Shutdown.Status == 0xFF)
+			break;
+	
 		/*timeStampsSMPtr->PMTimeStamp = 599.034;
 		Sleep(50);
 		if (_kbhit()) break;*/
@@ -63,17 +109,16 @@ int main()
 		//if ((CRITICALMASK & PMSMPtr->Heartbeat.Status) != CRITICALMASK) {
 		//	//check which heartbeat is not working
 		//	
-		//	for (int i = 1; i <= ModuleList->Length; i++) {
-		//		//if(i&PMSMPtr->Heartbeat.Status==1)
-		//		std::cout << PMSMPtr->Heartbeat.Flags.processList[i] << std::endl;
-		//	}
-		//	/*for (int i = 1; i <= 32; i<<=1) {
-		//		if (i & PMSMPtr->Heartbeat.Status == 1)
-		//			std::cout << PMSMPtr->Heartbeat.Status << std::endl;
-		//			PMSMPtr->Heartbeat.Status = PMSMPtr->Heartbeat.Status && 1;
-		//			std::cout << PMSMPtr->Heartbeat.Status << std::endl;
-		//		
-		//	}*/
+			for (int i = 1; i <= ModuleList->Length; i++) {
+				if(i&PMSMPtr->Heartbeat.Status==1)
+				std::cout << PMSMPtr->Heartbeat.Flags.processList[i] << std::endl;
+			}
+			for (int i = 1; i <= 32; i<<=1) {
+				if (i & PMSMPtr->Heartbeat.Status == 1)
+					std::cout << PMSMPtr->Heartbeat.Status << std::endl;
+					PMSMPtr->Heartbeat.Status = PMSMPtr->Heartbeat.Status ^ 1;
+					std::cout << PMSMPtr->Heartbeat.Status << std::endl;
+			}
 		//}
 		//if heartbeats are ok then reset
 
@@ -122,30 +167,17 @@ int main()
 	//	//else std::cout << "zero" << std::endl;
 
 	//	}
-	std::cout << timePtr->PM << std::endl;
-	Console::WriteLine(timePtr->PM);
-	if ((CRITICALMASK & PMSMPtr->Heartbeat.Status) == CRITICALMASK) {
-		PMSMPtr->Heartbeat.Flags.Laser = 0;
-		PMSMPtr->Heartbeat.Flags.OpenGL = 0;
-		PMSMPtr->Heartbeat.Flags.Camera = 0;
-	}
-	else if (((timePtr->Camera - timePtr->PM) || (timePtr->Display - timePtr->PM) || (timePtr->Laser - timePtr->PM)) > PMSMPtr->LifeCounter)
-		PMSMPtr->Shutdown.Status = 0xFF;
-	if ((NONCRITICALMASK & PMSMPtr->Heartbeat.Status) == NONCRITICALMASK){
-		PMSMPtr->Heartbeat.Flags.Laser = 0;
-		PMSMPtr->Heartbeat.Flags.OpenGL = 0;
-		PMSMPtr->Heartbeat.Flags.Camera = 0;
-	}
+
 	
 	Console::WriteLine("Process management terminated normally.");
-	Sleep(1000000000);
+	Sleep(7000);
 	return 0;
 }
 
 void print(ProcessManagement* PMSMPtr) {
 	std::cout << "start" << std::endl;
 	std::cout <<"Laser " << (int)PMSMPtr->Heartbeat.Flags.Laser << std::endl;
-	std::cout <<"GL " << (int)PMSMPtr->Heartbeat.Flags.OpenGL << std::endl;
+	std::cout <<"GL " << (int)PMSMPtr->Heartbeat.Flags.Display << std::endl;
 	std::cout <<"cam " << (int)PMSMPtr->Heartbeat.Flags.Camera << std::endl;
 	std::cout <<"veh " << (int)PMSMPtr->Heartbeat.Flags.VehicleControl << std::endl;
 	std::cout <<"gps " << (int)PMSMPtr->Heartbeat.Flags.GPS << std::endl;
