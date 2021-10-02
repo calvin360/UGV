@@ -207,7 +207,6 @@ void idle() {
 			PM->Heartbeat.Flags.Display == 1;
 		time1->Display = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine(time1->Display);
-		Sleep(1000);
 		Console::WriteLine("Display time stamp    : {0,12:F3} {1,12:X8}", time1->Display, PM->Shutdown.Status);
 		if (PM->Shutdown.Status == 0xFF || PM->Shutdown.Status == 0x03)
 			exit(-1);
