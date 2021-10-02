@@ -65,7 +65,7 @@
     <ClCompile Include="KeyManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Displaymain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Messages.cpp">
@@ -84,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Vehicle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SMObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

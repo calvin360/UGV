@@ -10,8 +10,13 @@
 #include <GL/glut.h>
 
 #include <turbojpeg.h>
+#using <System.dll>
 
-void display();
+using namespace System;
+using namespace System::Diagnostics;
+using namespace System::Threading;
+
+void Camera();
 void idle();
 
 GLuint tex;
@@ -20,8 +25,22 @@ GLuint tex;
 zmq::context_t context(1);
 zmq::socket_t subscriber(context, ZMQ_SUB);
 
+timeStamps* time1;
+ProcessManagement* PM;
+
 int main(int argc, char** argv)
 {
+	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
+	tObj.SMCreate();
+	tObj.SMAccess();
+	timeStamps* timePtr = (timeStamps*)tObj.pData;
+	time1 = timePtr;
+	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+	PMObj.SMCreate();
+	PMObj.SMAccess();
+	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
+	PM = PMSMPtr;
+
 	//Define window size
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
@@ -33,7 +52,7 @@ int main(int argc, char** argv)
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutCreateWindow("MTRN3500 - Camera");
 
-	glutDisplayFunc(display);
+	glutDisplayFunc(Camera);
 	glutIdleFunc(idle);
 	glGenTextures(1, &tex);
 
@@ -47,7 +66,7 @@ int main(int argc, char** argv)
 }
 
 
-void display()
+void Camera()
 {
 	//Set camera as gl texture
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -65,6 +84,20 @@ void display()
 }
 void idle()
 {
+	if (PM->Heartbeat.Flags.Camera == 0)
+		PM->Heartbeat.Flags.Camera = 1;
+	time1->Camera = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
+	Console::WriteLine(time1->Camera);
+	Sleep(1000);
+	Console::WriteLine("Camera time stamp    : {0,12:F3} {1,12:X8}", time1->Camera, PM->Shutdown.Status);
+	if (PM->Shutdown.Status == 0xFF || PM->Shutdown.Status == 0x07)
+		exit(-1);
+	else if ((time1->Camera - time1->PM) > (PM->LifeCounter)) {
+		Console::WriteLine("PM died");
+		exit(-1);
+	}
+	else if (_kbhit())
+		exit(-1);
 
 	//receive from zmq
 	zmq::message_t update;
@@ -94,6 +127,6 @@ void idle()
 		delete[] buffer;
 	}
 
-	display();
+	Camera();
 }
 

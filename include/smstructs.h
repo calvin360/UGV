@@ -24,7 +24,7 @@ struct timeStamps {
 	double Display;
 	double Laser;
 	double PM;
-	double Vehicle;
+	double VehicleControl;
 	double GPS;
 };
 
@@ -50,11 +50,11 @@ struct SM_GPS
 struct UnitFlags
 {
 	unsigned char	Laser : 1,				//CRITICAL
-					Display : 1,			//CRITICAL
-					Camera : 1,				//CRITICAL
-					VehicleControl : 1,		//NONCRITICAL
-					GPS : 1,				//NONCRITICAL
-					Garbage : 3;			//filler padding
+		Display : 1,			//CRITICAL
+		Camera : 1,				//CRITICAL
+		VehicleControl : 1,		//NONCRITICAL
+		GPS : 1,				//NONCRITICAL
+		Garbage : 3;			//filler padding
 };
 
 union ExecFlags

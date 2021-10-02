@@ -26,6 +26,14 @@
 	#include <sys/time.h>
 #endif
 
+#include <Windows.h>
+#include <conio.h>
+
+#include "SMObject.h"
+#include "smstructs.h"
+
+#using <System.dll>
+
 
 #include "Camera.hpp"
 #include "Ground.hpp"
@@ -51,6 +59,9 @@ void mouse(int button, int state, int x, int y);
 void dragged(int x, int y);
 void motion(int x, int y);
 
+using namespace System;
+using namespace System::Diagnostics;
+using namespace System::Threading;
 using namespace std;
 using namespace scos;
 
@@ -64,11 +75,26 @@ Vehicle * vehicle = NULL;
 double speed = 0;
 double steering = 0;
 
+
+timeStamps* time1;
+ProcessManagement* PM;
+
 //int _tmain(int argc, _TCHAR* argv[]) {
 int main(int argc, char ** argv) {
 
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
+
+	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
+	tObj.SMCreate();
+	tObj.SMAccess();
+	timeStamps* timePtr = (timeStamps*)tObj.pData;
+	time1 = timePtr;
+	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+	PMObj.SMCreate();
+	PMObj.SMAccess();
+	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
+	PM = PMSMPtr;
 
 	glutInit(&argc, (char**)(argv));
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
@@ -107,6 +133,8 @@ int main(int argc, char ** argv) {
 		delete vehicle;
 	}
 
+	Console::WriteLine("Display process ended");
+	Sleep(10000);
 	return 0;
 }
 
@@ -174,6 +202,28 @@ double getTime()
 }
 
 void idle() {
+
+		if (PM->Heartbeat.Flags.Display == 0)
+			PM->Heartbeat.Flags.Display == 1;
+		time1->Display = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
+		Console::WriteLine(time1->Display);
+		Sleep(1000);
+		Console::WriteLine("Display time stamp    : {0,12:F3} {1,12:X8}", time1->Display, PM->Shutdown.Status);
+		if (PM->Shutdown.Status == 0xFF || PM->Shutdown.Status == 0x03)
+			exit(-1);
+		else if ((time1->Display - time1->PM) > (PM->LifeCounter)) {
+			Console::WriteLine("PM died");
+			exit(-1);
+		}
+		else if (_kbhit()) 
+			exit(-1);
+
+		/*	did pm put flag down
+				true->put flag up
+				false->is pm time stamp older by agreed time gap*/
+				//true-> shutdown all
+	
+	
 
 	if (KeyManager::get()->isAsciiKeyPressed('a')) {
 		Camera::get()->strafeLeft();
