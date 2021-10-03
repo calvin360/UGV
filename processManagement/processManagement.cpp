@@ -170,7 +170,7 @@ int main()
 
 	Console::WriteLine(NONCRITICALMASK);
 	Console::WriteLine("Process management terminated normally.");
-	Sleep(10000);
+	Sleep(1000);
 	return 0;
 }
 
