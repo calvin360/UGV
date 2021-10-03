@@ -28,10 +28,10 @@ void print(ProcessManagement* PMSMPtr);
 TCHAR Units[10][20] = //
 {
 TEXT("LASER.exe"),
-TEXT("Display.exe"),
 TEXT("GPS.exe"),
 TEXT("VehicleControl.exe"),
-TEXT("Camera.exe")
+TEXT("Camera.exe"),
+TEXT("Display.exe")
 };
 
 int main()
@@ -50,7 +50,7 @@ int main()
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
 	PMSMPtr->Heartbeat.Status = 0x07; 
-	PMSMPtr->LifeCounter = 3;
+	PMSMPtr->LifeCounter = 10;
 	timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	//start all 5 modules
 	StartProcesses();

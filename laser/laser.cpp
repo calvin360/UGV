@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <conio.h>
 
-#include "SMObject.h"
+#include <SMObject.h>
 #include "smstructs.h"
 
 #using <System.dll>
@@ -31,7 +31,7 @@ int main(void) {
 	// String command to ask for Channel 1 analogue voltage from the PLC
 	// These command are available on Galil RIO47122 command reference manual
 	// available online
-	String^ AskScan = gcnew String("sRN LMDscandata");
+	String^ AskScan = gcnew String("z5260528\n sRN LMDscandata");
 	// String to store received data for display
 	String^ ResponseData;
 
@@ -44,17 +44,31 @@ int main(void) {
 	Client->ReceiveBufferSize = 1024;
 	Client->SendBufferSize = 1024;
 
+	char* char_arr;
+	String^ Str = gcnew String("z5260528\n");
+	//char_arr = &str[0];
+
 	// unsigned char arrays of 16 bytes each are created on managed heap
 	SendData = gcnew array<unsigned char>(16);
 	ReadData = gcnew array<unsigned char>(2500);
 	// Convert string command to an array of unsigned char
-	SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
 
 
-	// Get the network streab object associated with clien so we 
+	// Get the network streab object associated with client so we 
 	// can use it to read and write
 	NetworkStream^ Stream = Client->GetStream();
-
+	//SendData = System::Text::Encoding::ASCII->GetBytes(Str);
+	//Stream->WriteByte(0x02);
+	//Stream->Write(SendData, 0, SendData->Length);
+	//Stream->WriteByte(0x03);
+	//System::Threading::Thread::Sleep(1000);
+	//SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
+	//// Read the incoming data
+	//Stream->Read(ReadData, 0, ReadData->Length);
+	//// Convert incoming data from an array of unsigned char bytes to an ASCII string
+	//ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
+	//// Print the received string on the screen
+	//Console::WriteLine(ResponseData);
 
 	while (!_kbhit()) {
 		if (PMSMPtr->Heartbeat.Flags.Laser == 0)
@@ -63,20 +77,36 @@ int main(void) {
 		Console::WriteLine(timePtr->Laser);
 		Sleep(100);
 		Console::WriteLine("Laser time stamp    : {0,12:F3} {1,12:X8}", timePtr->Laser, PMSMPtr->Shutdown.Status);
-		if (PMSMPtr->Shutdown.Status==0xFF|| PMSMPtr->Shutdown.Status == 0x01)
+		if (PMSMPtr->Shutdown.Status == 0xFF || PMSMPtr->Shutdown.Status == 0x01)
 			break;
 		if ((timePtr->Laser - timePtr->PM) > (PMSMPtr->LifeCounter)) {
 			Console::WriteLine(timePtr->Laser - timePtr->PM);
 			Console::WriteLine("PM died");
 			break;
 		}
-		
-		// Write command asking for data
+		SendData = System::Text::Encoding::ASCII->GetBytes(Str);
 		Stream->WriteByte(0x02);
 		Stream->Write(SendData, 0, SendData->Length);
 		Stream->WriteByte(0x03);
+		System::Threading::Thread::Sleep(1000);
+
+		// Read the incoming data
+		Stream->Read(ReadData, 0, ReadData->Length);
+		// Convert incoming data from an array of unsigned char bytes to an ASCII string
+		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
+		// Print the received string on the screen
+		Console::WriteLine(ResponseData);
+
+
+		// Write command asking for data
+		//SendData = System::Text::Encoding::ASCII->GetBytes(Str);
+		Stream->WriteByte(0x02);
+		//Stream->Write(SendData, 0, SendData->Length);
+		SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
+		Stream->Write(SendData, 0, SendData->Length);
+		Stream->WriteByte(0x03);
 		// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
-		System::Threading::Thread::Sleep(10);
+		System::Threading::Thread::Sleep(1000);
 		// Read the incoming data
 		Stream->Read(ReadData, 0, ReadData->Length);
 		// Convert incoming data from an array of unsigned char bytes to an ASCII string
