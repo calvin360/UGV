@@ -11,17 +11,20 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 
 int main(void) {
-	Console::WriteLine("1");
 	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
 	tObj.SMCreate();
 	tObj.SMAccess();
 	timeStamps* timePtr = (timeStamps*)tObj.pData;
+	//SM for PM
 	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
 	PMObj.SMCreate();
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
-	//timeStampsSMPtr = (timeStamps*)PMObj.pData;
-	Console::WriteLine("2");
+	//SM for laser data
+	SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
+	LsObj.SMCreate();
+	LsObj.SMAccess();
+	SM_Laser* LsPtr = (SM_Laser*)LsObj.pData;
 	// LMS151 port number must be 23000
 	int PortNumber = 23000;
 	// Pointer to TcpClent type object on managed heap
@@ -35,7 +38,6 @@ int main(void) {
 	String^ AskScan = gcnew String("sRN LMDscandata");
 	// String to store received data for display
 	String^ ResponseData;
-	Console::WriteLine("3");
 	// Creat TcpClient object and connect to it
 	Client = gcnew TcpClient("192.168.1.200", PortNumber);
 	// Configure connection
@@ -44,21 +46,16 @@ int main(void) {
 	Client->SendTimeout = 500;//ms
 	Client->ReceiveBufferSize = 1024;
 	Client->SendBufferSize = 1024;
-	Console::WriteLine("4");
-	char* char_arr;
 	String^ Str = gcnew String("5260528\n");
-	//char_arr = &str[0];
-
 	// unsigned char arrays of 16 bytes each are created on managed heap
 	SendData = gcnew array<unsigned char>(16);
 	ReadData = gcnew array<unsigned char>(2500);
-	// Convert string command to an array of unsigned char
-	Console::WriteLine("5");
 
 	// Get the network streab object associated with client so we 
 	// can use it to read and write
 	NetworkStream^ Stream = Client->GetStream();
 	//semd zID and wait for response
+	// Convert string command to an array of unsigned char
 	SendData = System::Text::Encoding::ASCII->GetBytes(Str);
 	Stream->Write(SendData, 0, SendData->Length);
 	System::Threading::Thread::Sleep(10);
@@ -69,6 +66,12 @@ int main(void) {
 	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	// Print the received string on the screen
 	Console::WriteLine(ResponseData);
+
+	array<wchar_t>^ Space = { ' ' };
+	array<String^>^ StringArray;
+	double StartAngle;
+	double Res;
+	int NumRanges;
 
 	while (!_kbhit()) {
 		if (PMSMPtr->Heartbeat.Flags.Laser == 0)
@@ -93,14 +96,28 @@ int main(void) {
 		System::Threading::Thread::Sleep(10);
 		// Read the incoming data
 		Stream->Read(ReadData, 0, ReadData->Length);
-		//long numdata = 0;
-		//while (numdata != sizeof(SM_Laser))
-		//	numdata += Stream->Read(ReadData, numdata, sizeof(SM_Laser) - numdata);
-		//Stream->Read(ReadData, 0, ReadData->Length);
 		// Convert incoming data from an array of unsigned char bytes to an ASCII string
 		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 		// Print the received string on the screen
 		Console::WriteLine(ResponseData);
+		StringArray = ResponseData->Split(Space);
+		StartAngle = System::Convert::ToInt32(StringArray[23], 16);
+		Console::WriteLine(StartAngle);
+		Res= System::Convert::ToInt32(StringArray[24], 16)/10000.0;
+		Console::WriteLine(Res);
+		NumRanges = System::Convert::ToInt32(StringArray[25], 16);
+		Console::WriteLine(NumRanges);
+		array<double>^ Range = gcnew array<double>(NumRanges);
+		array<double>^ RangeX = gcnew array<double>(NumRanges);
+		array<double>^ RangeY = gcnew array<double>(NumRanges);
+
+		for (int i = 0; i < NumRanges; i++) {
+			Range[i]= System::Convert::ToInt32(StringArray[26+i], 16);
+			LsPtr->x[i] = Range[i] * sin(i * Res);
+			LsPtr->y[i] = Range[i] * sin(i * Res);
+		}
+		/*LsPtr->x = RangeX;
+		LsPtr->y = RangeY;*/
 	}
 
 	Stream->Close();
