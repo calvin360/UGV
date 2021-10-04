@@ -57,18 +57,17 @@ int main(void) {
 	// Get the network streab object associated with client so we 
 	// can use it to read and write
 	NetworkStream^ Stream = Client->GetStream();
-	//SendData = System::Text::Encoding::ASCII->GetBytes(Str);
-	//Stream->WriteByte(0x02);
-	//Stream->Write(SendData, 0, SendData->Length);
-	//Stream->WriteByte(0x03);
-	//System::Threading::Thread::Sleep(1000);
-	//SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
-	//// Read the incoming data
-	//Stream->Read(ReadData, 0, ReadData->Length);
-	//// Convert incoming data from an array of unsigned char bytes to an ASCII string
-	//ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
-	//// Print the received string on the screen
-	//Console::WriteLine(ResponseData);
+	//semd zID and wait for response
+	SendData = System::Text::Encoding::ASCII->GetBytes(Str);
+	Stream->Write(SendData, 0, SendData->Length);
+	System::Threading::Thread::Sleep(1000);
+	SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
+	// Read the incoming data
+	Stream->Read(ReadData, 0, ReadData->Length);
+	// Convert incoming data from an array of unsigned char bytes to an ASCII string
+	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
+	// Print the received string on the screen
+	Console::WriteLine(ResponseData);
 
 	while (!_kbhit()) {
 		if (PMSMPtr->Heartbeat.Flags.Laser == 0)
@@ -90,23 +89,12 @@ int main(void) {
 		Stream->WriteByte(0x03);
 		System::Threading::Thread::Sleep(1000);
 
-		// Read the incoming data
-		Stream->Read(ReadData, 0, ReadData->Length);
-		// Convert incoming data from an array of unsigned char bytes to an ASCII string
-		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
-		// Print the received string on the screen
-		Console::WriteLine(ResponseData);
-
-
 		// Write command asking for data
-		//SendData = System::Text::Encoding::ASCII->GetBytes(Str);
 		Stream->WriteByte(0x02);
-		//Stream->Write(SendData, 0, SendData->Length);
-		SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
 		Stream->Write(SendData, 0, SendData->Length);
 		Stream->WriteByte(0x03);
 		// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
-		System::Threading::Thread::Sleep(1000);
+		System::Threading::Thread::Sleep(10);
 		// Read the incoming data
 		Stream->Read(ReadData, 0, ReadData->Length);
 		// Convert incoming data from an array of unsigned char bytes to an ASCII string
