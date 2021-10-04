@@ -11,6 +11,7 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 
 int main(void) {
+	Console::WriteLine("1");
 	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
 	tObj.SMCreate();
 	tObj.SMAccess();
@@ -20,7 +21,7 @@ int main(void) {
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
 	//timeStampsSMPtr = (timeStamps*)PMObj.pData;
-
+	Console::WriteLine("2");
 	// LMS151 port number must be 23000
 	int PortNumber = 23000;
 	// Pointer to TcpClent type object on managed heap
@@ -31,10 +32,10 @@ int main(void) {
 	// String command to ask for Channel 1 analogue voltage from the PLC
 	// These command are available on Galil RIO47122 command reference manual
 	// available online
-	String^ AskScan = gcnew String("z5260528\n sRN LMDscandata");
+	String^ AskScan = gcnew String("sRN LMDscandata");
 	// String to store received data for display
 	String^ ResponseData;
-
+	Console::WriteLine("3");
 	// Creat TcpClient object and connect to it
 	Client = gcnew TcpClient("192.168.1.200", PortNumber);
 	// Configure connection
@@ -43,16 +44,16 @@ int main(void) {
 	Client->SendTimeout = 500;//ms
 	Client->ReceiveBufferSize = 1024;
 	Client->SendBufferSize = 1024;
-
+	Console::WriteLine("4");
 	char* char_arr;
-	String^ Str = gcnew String("z5260528\n");
+	String^ Str = gcnew String("5260528\n");
 	//char_arr = &str[0];
 
 	// unsigned char arrays of 16 bytes each are created on managed heap
 	SendData = gcnew array<unsigned char>(16);
 	ReadData = gcnew array<unsigned char>(2500);
 	// Convert string command to an array of unsigned char
-
+	Console::WriteLine("5");
 
 	// Get the network streab object associated with client so we 
 	// can use it to read and write
@@ -60,7 +61,7 @@ int main(void) {
 	//semd zID and wait for response
 	SendData = System::Text::Encoding::ASCII->GetBytes(Str);
 	Stream->Write(SendData, 0, SendData->Length);
-	System::Threading::Thread::Sleep(1000);
+	System::Threading::Thread::Sleep(10);
 	SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
 	// Read the incoming data
 	Stream->Read(ReadData, 0, ReadData->Length);
@@ -91,10 +92,11 @@ int main(void) {
 		// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
 		System::Threading::Thread::Sleep(10);
 		// Read the incoming data
-		long numdata = 0;
-		while (numdata != sizeof(SM_Laser))
-			numdata += Stream->Read(ReadData, numdata, sizeof(SM_Laser) - numdata);
 		Stream->Read(ReadData, 0, ReadData->Length);
+		//long numdata = 0;
+		//while (numdata != sizeof(SM_Laser))
+		//	numdata += Stream->Read(ReadData, numdata, sizeof(SM_Laser) - numdata);
+		//Stream->Read(ReadData, 0, ReadData->Length);
 		// Convert incoming data from an array of unsigned char bytes to an ASCII string
 		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 		// Print the received string on the screen
@@ -104,8 +106,6 @@ int main(void) {
 	Stream->Close();
 	Client->Close();
 
-	Console::ReadKey();
-	Console::ReadKey();
 	Console::WriteLine("Laser process ended");
 	Sleep(1000);
 	return 0;

@@ -27,11 +27,11 @@ void print(ProcessManagement* PMSMPtr);
 //defining start up sequence
 TCHAR Units[10][20] = //
 {
-TEXT("LASER.exe"),
 TEXT("GPS.exe"),
 TEXT("VehicleControl.exe"),
 TEXT("Camera.exe"),
-TEXT("Display.exe")
+TEXT("Display.exe"),
+TEXT("LASER.exe")
 };
 
 int main()
@@ -63,7 +63,6 @@ int main()
 		Console::WriteLine("GPS time stamp    : {0,12:F3} {1,12:X8}", timePtr->GPS, PMSMPtr->Shutdown.Status);
 		Console::WriteLine("Life    : {0,12:F3} {1,12:X8}", (timePtr->PM - timePtr->Display), PMSMPtr->Shutdown.Status);
 		std::cout << PMSMPtr->LifeCounter << std::endl;
-		PMSMPtr->Heartbeat.Flags.Camera = 1;
 		Sleep(1000);
 		//checking crit processes
 		if ((CRITICALMASK & PMSMPtr->Heartbeat.Status) == CRITICALMASK) {
