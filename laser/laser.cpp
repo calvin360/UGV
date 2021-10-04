@@ -99,14 +99,14 @@ int main(void) {
 		// Convert incoming data from an array of unsigned char bytes to an ASCII string
 		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 		// Print the received string on the screen
-		Console::WriteLine(ResponseData);
+		//Console::WriteLine(ResponseData);
 		StringArray = ResponseData->Split(Space);
 		StartAngle = System::Convert::ToInt32(StringArray[23], 16);
-		Console::WriteLine(StartAngle);
 		Res= System::Convert::ToInt32(StringArray[24], 16)/10000.0;
-		Console::WriteLine(Res);
 		NumRanges = System::Convert::ToInt32(StringArray[25], 16);
-		Console::WriteLine(NumRanges);
+		//Console::WriteLine(StartAngle);
+		//Console::WriteLine(Res);
+		//Console::WriteLine(NumRanges);
 		array<double>^ Range = gcnew array<double>(NumRanges);
 		array<double>^ RangeX = gcnew array<double>(NumRanges);
 		array<double>^ RangeY = gcnew array<double>(NumRanges);
@@ -116,8 +116,9 @@ int main(void) {
 			LsPtr->x[i] = Range[i] * sin(i * Res);
 			LsPtr->y[i] = Range[i] * sin(i * Res);
 		}
-		/*LsPtr->x = RangeX;
-		LsPtr->y = RangeY;*/
+		for (int i = 0; i < NumRanges; i++) {
+			Console::WriteLine("range: {0, 12:F3} {1, 12:F3}", LsPtr->x[i], LsPtr->y[i]);
+		}
 	}
 
 	Stream->Close();

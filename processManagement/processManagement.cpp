@@ -28,8 +28,8 @@ TCHAR Units[10][20] = //
 TEXT("GPS.exe"),
 TEXT("VehicleControl.exe"),
 TEXT("Camera.exe"),
-TEXT("LASER.exe"),
-TEXT("Display.exe")
+TEXT("Display.exe"),
+TEXT("LASER.exe")
 };
 
 int main()
