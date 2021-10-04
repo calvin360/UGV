@@ -134,7 +134,7 @@ int main(int argc, char ** argv) {
 	}
 
 	Console::WriteLine("Display process ended");
-	Sleep(10000);
+	Sleep(1000);
 	return 0;
 }
 

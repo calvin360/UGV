@@ -83,11 +83,6 @@ int main(void) {
 			Console::WriteLine("PM died");
 			break;
 		}
-		SendData = System::Text::Encoding::ASCII->GetBytes(Str);
-		Stream->WriteByte(0x02);
-		Stream->Write(SendData, 0, SendData->Length);
-		Stream->WriteByte(0x03);
-		System::Threading::Thread::Sleep(1000);
 
 		// Write command asking for data
 		Stream->WriteByte(0x02);
@@ -96,6 +91,9 @@ int main(void) {
 		// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
 		System::Threading::Thread::Sleep(10);
 		// Read the incoming data
+		long numdata = 0;
+		while (numdata != sizeof(SM_Laser))
+			numdata += Stream->Read(ReadData, numdata, sizeof(SM_Laser) - numdata);
 		Stream->Read(ReadData, 0, ReadData->Length);
 		// Convert incoming data from an array of unsigned char bytes to an ASCII string
 		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);

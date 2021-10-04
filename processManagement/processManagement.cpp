@@ -50,7 +50,8 @@ int main()
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
 	PMSMPtr->Heartbeat.Status = 0x07; 
-	PMSMPtr->LifeCounter = 10;
+	//wait time for unresponsive processes (seconds)
+	PMSMPtr->LifeCounter = 3;
 	timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	//start all 5 modules
 	StartProcesses();
