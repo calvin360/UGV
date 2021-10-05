@@ -20,6 +20,7 @@ you see fit.
 
 #include <iostream>
 #include <SMObject.h>
+#include <smstructs.h>
 #include <SMFcn.h>
 #using <System.dll>
 
@@ -33,9 +34,9 @@ ref class UGV_module
 	public:
 		virtual int connect(String^ hostName, int portNumber) = 0;	// Establish TCP connection
 		virtual int setupSharedMemory() = 0;						// Create and access shared memory objects
-		virtual int getData() = 0;									// Get data from sensor (GPS / Laser)
+		virtual int getData(array<unsigned char>^ SendData, String^ ResponseData) = 0;									// Get data from sensor (GPS / Laser)
 		virtual int checkData() = 0;								// Check Data is correct (eg headers)
-		virtual int sendDataToSharedMemory() = 0;					// Save Data in shared memory structures
+		virtual int sendDataToSharedMemory(int NumRanges, array<String^>^ StringArray, SM_Laser* LsPtr, double Res) = 0;					// Save Data in shared memory structures
 		virtual bool getShutdownFlag() = 0;							// Get Shutdown signal for module, from Process Management SM
 		virtual int setHeartbeat(bool heartbeat) = 0;				// Update heartbeat signal for module
 

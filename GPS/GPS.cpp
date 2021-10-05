@@ -3,17 +3,77 @@
 
 int GPS::connect(String^ hostName, int portNumber)
 {
-	// YOUR CODE HERE
+	// Pointer to TcpClent type object on managed heap
+	TcpClient^ Client;
+	// arrays of unsigned chars to send and receive data
+	array<unsigned char>^ SendData;
+	array<unsigned char>^ ReadData;
+	String^ AskScan = gcnew String("sRN LMDscandata");
+	String^ ResponseData;
+	Client = gcnew TcpClient(hostName, portNumber);
+	Client->NoDelay = true;
+	Client->ReceiveTimeout = 500;//ms
+	Client->SendTimeout = 500;//ms
+	Client->ReceiveBufferSize = 1024;
+	Client->SendBufferSize = 1024;
+	String^ Str = gcnew String("5260528\n");
+	SendData = gcnew array<unsigned char>(16);
+	ReadData = gcnew array<unsigned char>(2500);
+	NetworkStream^ Stream = Client->GetStream();
+	SendData = System::Text::Encoding::ASCII->GetBytes(Str);
+	Stream->Write(SendData, 0, SendData->Length);
+	System::Threading::Thread::Sleep(10);
+	SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
+	// Read the incoming data
+	Stream->Read(ReadData, 0, ReadData->Length);
+	// Convert incoming data from an array of unsigned char bytes to an ASCII string
+	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
+	// Print the received string on the screen
+	Console::WriteLine(ResponseData);
+
 	return 1;
 }
 int GPS::setupSharedMemory()
 {
-	// YOUR CODE HERE
+	//SM for timestamps
+	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
+	tObj.SMCreate();
+	tObj.SMAccess();
+	timeStamps* timePtr = (timeStamps*)tObj.pData;
+	//SM for PM
+	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+	PMObj.SMCreate();
+	PMObj.SMAccess();
+	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
+	SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
+	LsObj.SMCreate();
+	LsObj.SMAccess();
+	SM_Laser* LsPtr = (SM_Laser*)LsObj.pData;
+
 	return 1;
 }
-int GPS::getData()
+int GPS::getData(array<unsigned char>^ SendData, String^ ResponseData)
 {
-	// YOUR CODE HERE
+	// Write command asking for data
+	Stream->WriteByte(0x02);
+	Stream->Write(SendData, 0, SendData->Length);
+	Stream->WriteByte(0x03);
+	// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
+	System::Threading::Thread::Sleep(10);
+	// Read the incoming data
+	Stream->Read(ReadData, 0, ReadData->Length);
+	// Convert incoming data from an array of unsigned char bytes to an ASCII string
+	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
+	// Print the received string on the screen
+	//Console::WriteLine(ResponseData);
+	array<String^>^ StringArray = ResponseData->Split(' ');
+	double StartAngle = System::Convert::ToInt32(StringArray[23], 16);
+	double Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
+	int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
+	//Console::WriteLine(StartAngle);
+	//Console::WriteLine(Res);
+	//Console::WriteLine(NumRanges);
+	
 	return 1;
 }
 int GPS::checkData()
@@ -21,9 +81,17 @@ int GPS::checkData()
 	// YOUR CODE HERE
 	return 1;
 }
-int GPS::sendDataToSharedMemory()
+int GPS::sendDataToSharedMemory(int NumRanges, array<String^>^ StringArray, SM_Laser* LsPtr, double Res)
 {
-	// YOUR CODE HERE
+	array<double>^ Range = gcnew array<double>(NumRanges);
+	array<double>^ RangeX = gcnew array<double>(NumRanges);
+	array<double>^ RangeY = gcnew array<double>(NumRanges);
+
+	for (int i = 0; i < NumRanges; i++) {
+		Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
+		LsPtr->x[i] = Range[i] * sin(i * Res);
+		LsPtr->y[i] = Range[i] * sin(i * Res);
+	}
 	return 1;
 }
 bool GPS::getShutdownFlag()

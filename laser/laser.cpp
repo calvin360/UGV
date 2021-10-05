@@ -3,6 +3,7 @@
 
 #include <SMObject.h>
 #include "smstructs.h"
+#include <UGV_module.h>
 
 #using <System.dll>
 
@@ -11,63 +12,67 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 
 int main(void) {
-	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
-	tObj.SMCreate();
-	tObj.SMAccess();
-	timeStamps* timePtr = (timeStamps*)tObj.pData;
-	//SM for PM
-	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-	PMObj.SMCreate();
-	PMObj.SMAccess();
-	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
-	//SM for laser data
-	SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
-	LsObj.SMCreate();
-	LsObj.SMAccess();
-	SM_Laser* LsPtr = (SM_Laser*)LsObj.pData;
-	// LMS151 port number must be 23000
+	//SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
+	//tObj.SMCreate();
+	//tObj.SMAccess();
+	//timeStamps* timePtr = (timeStamps*)tObj.pData;
+	////SM for PM
+	//SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+	//PMObj.SMCreate();
+	//PMObj.SMAccess();
+	//ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
+	////SM for laser data
+	//SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
+	//LsObj.SMCreate();
+	//LsObj.SMAccess();
+	//SM_Laser* LsPtr = (SM_Laser*)LsObj.pData;
+
+	UGV_module setupSharedMemory();
+
+	//// LMS151 port number must be 23000
+	//int PortNumber = 23000;
+	//// Pointer to TcpClent type object on managed heap
+	//TcpClient^ Client;
+	//// arrays of unsigned chars to send and receive data
+	//array<unsigned char>^ SendData;
+	//array<unsigned char>^ ReadData;
+	//// String command to ask for Channel 1 analogue voltage from the PLC
+	//// These command are available on Galil RIO47122 command reference manual
+	//// available online
+	//String^ AskScan = gcnew String("sRN LMDscandata");
+	//// String to store received data for display
+	//String^ ResponseData;
+	//// Creat TcpClient object and connect to it
+	//Client = gcnew TcpClient("192.168.1.200", PortNumber);
+	//// Configure connection
+	//Client->NoDelay = true;
+	//Client->ReceiveTimeout = 500;//ms
+	//Client->SendTimeout = 500;//ms
+	//Client->ReceiveBufferSize = 1024;
+	//Client->SendBufferSize = 1024;
+	//String^ Str = gcnew String("5260528\n");
+	//// unsigned char arrays of 16 bytes each are created on managed heap
+	//SendData = gcnew array<unsigned char>(16);
+	//ReadData = gcnew array<unsigned char>(2500);
+	//// Get the network streab object associated with client so we 
+	//// can use it to read and write
+	//NetworkStream^ Stream = Client->GetStream();
+	////semd zID and wait for response
+	//// Convert string command to an array of unsigned char
+	//SendData = System::Text::Encoding::ASCII->GetBytes(Str);
+	//Stream->Write(SendData, 0, SendData->Length);
+	//System::Threading::Thread::Sleep(10);
+	//SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
+	//// Read the incoming data
+	//Stream->Read(ReadData, 0, ReadData->Length);
+	//// Convert incoming data from an array of unsigned char bytes to an ASCII string
+	//ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
+	//// Print the received string on the screen
+	//Console::WriteLine(ResponseData);
 	int PortNumber = 23000;
-	// Pointer to TcpClent type object on managed heap
-	TcpClient^ Client;
-	// arrays of unsigned chars to send and receive data
-	array<unsigned char>^ SendData;
-	array<unsigned char>^ ReadData;
-	// String command to ask for Channel 1 analogue voltage from the PLC
-	// These command are available on Galil RIO47122 command reference manual
-	// available online
-	String^ AskScan = gcnew String("sRN LMDscandata");
-	// String to store received data for display
-	String^ ResponseData;
-	// Creat TcpClient object and connect to it
-	Client = gcnew TcpClient("192.168.1.200", PortNumber);
-	// Configure connection
-	Client->NoDelay = true;
-	Client->ReceiveTimeout = 500;//ms
-	Client->SendTimeout = 500;//ms
-	Client->ReceiveBufferSize = 1024;
-	Client->SendBufferSize = 1024;
-	String^ Str = gcnew String("5260528\n");
-	// unsigned char arrays of 16 bytes each are created on managed heap
-	SendData = gcnew array<unsigned char>(16);
-	ReadData = gcnew array<unsigned char>(2500);
+	String^ hostName = gcnew String("192.168.1.200");
+	UGV_module connect(hostName, PortNumber);
 
-	// Get the network streab object associated with client so we 
-	// can use it to read and write
-	NetworkStream^ Stream = Client->GetStream();
-	//semd zID and wait for response
-	// Convert string command to an array of unsigned char
-	SendData = System::Text::Encoding::ASCII->GetBytes(Str);
-	Stream->Write(SendData, 0, SendData->Length);
-	System::Threading::Thread::Sleep(10);
-	SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
-	// Read the incoming data
-	Stream->Read(ReadData, 0, ReadData->Length);
-	// Convert incoming data from an array of unsigned char bytes to an ASCII string
-	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
-	// Print the received string on the screen
-	Console::WriteLine(ResponseData);
-
-	array<wchar_t>^ Space = { ' ' };
 	array<String^>^ StringArray;
 	double StartAngle;
 	double Res;
@@ -100,7 +105,7 @@ int main(void) {
 		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 		// Print the received string on the screen
 		//Console::WriteLine(ResponseData);
-		StringArray = ResponseData->Split(Space);
+		StringArray = ResponseData->Split(' ');
 		StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 		Res= System::Convert::ToInt32(StringArray[24], 16)/10000.0;
 		NumRanges = System::Convert::ToInt32(StringArray[25], 16);
