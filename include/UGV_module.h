@@ -17,6 +17,7 @@ you see fit.
 #define SUCCESS 0
 #define ERR_NO_DATA 1
 #define ERR_INVALID_DATA 2
+#define ERR_HB 3
 
 #include <iostream>
 #include <SMObject.h>
@@ -34,11 +35,11 @@ ref class UGV_module
 	public:
 		virtual int connect(String^ hostName, int portNumber) = 0;	// Establish TCP connection
 		virtual int setupSharedMemory() = 0;						// Create and access shared memory objects
-		virtual int getData(array<unsigned char>^ SendData, String^ ResponseData) = 0;									// Get data from sensor (GPS / Laser)
+		virtual int getData() = 0;									// Get data from sensor (GPS / Laser)
 		virtual int checkData() = 0;								// Check Data is correct (eg headers)
-		virtual int sendDataToSharedMemory(int NumRanges, array<String^>^ StringArray, SM_Laser* LsPtr, double Res) = 0;					// Save Data in shared memory structures
+		virtual int sendDataToSharedMemory() = 0;					// Save Data in shared memory structures
 		virtual bool getShutdownFlag() = 0;							// Get Shutdown signal for module, from Process Management SM
-		virtual int setHeartbeat(bool heartbeat) = 0;				// Update heartbeat signal for module
+		virtual int setHeartbeat() = 0;				// Update heartbeat signal for module
 
 		void getError()
 		{
@@ -53,6 +54,9 @@ ref class UGV_module
 				case ERR_INVALID_DATA:
 					std::cout << "ERROR: Invalid Data Received." << std::endl;
 					break;
+				case ERR_HB:
+					std::cout << "ERROR: Process Died." << std::endl;
+					break;
 			}
 		}
 
@@ -61,11 +65,20 @@ ref class UGV_module
 		int Error;							// Stores last error code
 		TcpClient^ Client;					// Handle for TCP connection
 		NetworkStream^ Stream;				// Handle for TCP data stream
-		array<unsigned char>^ ReadData;		// Array to store sensor Data
+		array<unsigned char>^ SendData;
+		array<unsigned char>^ ReadData;
+		String^ ResponseData;
+		array<String^>^ StringArray;
+		double StartAngle;
+		double Res;
+		int NumRanges;
 
-		SMObject* ProcessManagementData;	// Filled in setupSharedMemory(). For accessing PM shared Memory
-		SMObject* SensorData;				// Filled in setupSharedMemory(). For storing sensory data to shared Memory
-
+		SMObject* tObj;	// Filled in setupSharedMemory(). For accessing PM shared Memory
+		SMObject* PMObj;				// Filled in setupSharedMemory(). For storing sensory data to shared Memory
+		SMObject* LsObj;
+		timeStamps* timePtr;
+		ProcessManagement* PMSMPtr; 
+		SM_Laser* LsPtr;
 };
 
 #endif 
