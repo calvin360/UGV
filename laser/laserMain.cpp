@@ -13,6 +13,24 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 
 int main(void) {
+	Laser myLaser;
+	myLaser.setupSharedMemory();
+	myLaser.connect("192.168.1.200", 23000);
+
+	while (!_kbhit()) {
+		myLaser.setHeartbeat();
+		if (myLaser.getShutdownFlag() == 1) {
+			break;
+		}
+		myLaser.getData();
+		myLaser.sendDataToSharedMemory();
+	}
+
+	Console::WriteLine("Laser process ended");
+	Sleep(1000);
+	return 0;
+}
+		//if (PMSMPtr->Heartbeat.Flags.Laser == 0)
 	//SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
 	//tObj.SMCreate();
 	//tObj.SMAccess();
@@ -69,25 +87,7 @@ int main(void) {
 	//ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	//// Print the received string on the screen
 	//Console::WriteLine(ResponseData);
-	Laser myLaser;
-	myLaser.setupSharedMemory();
-	//int PortNumber = 23000;
-	//String^ hostName = gcnew String("192.168.1.200");
-	myLaser.connect("192.168.1.200", 23000);
-
-	//array<String^>^ StringArray;
-	//double StartAngle;
-	//double Res;
-	//int NumRanges;
-
-	while (!_kbhit()) {
-		myLaser.setHeartbeat();
-		if (myLaser.getShutdownFlag() == 3) {
-			break;
-		}
-		myLaser.getData();
-		myLaser.sendDataToSharedMemory();
-		//if (PMSMPtr->Heartbeat.Flags.Laser == 0)
+	
 		//	PMSMPtr->Heartbeat.Flags.Laser = 1;
 		//timePtr->Laser = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		//Console::WriteLine(timePtr->Laser);
@@ -132,9 +132,3 @@ int main(void) {
 		//for (int i = 0; i < NumRanges; i++) {
 		//	Console::WriteLine("range: {0, 12:F3} {1, 12:F3}", LsPtr->x[i], LsPtr->y[i]);
 		//}
-	}
-
-	Console::WriteLine("Laser process ended");
-	Sleep(1000);
-	return 0;
-}

@@ -8,10 +8,7 @@ int Laser::connect(String^ hostName, int portNumber)
 {
 	// Pointer to TcpClent type object on managed heap
 	// arrays of unsigned chars to send and receive data
-	//array<unsigned char>^ SendData;
-	//array<unsigned char>^ ReadData;
 	String^ AskScan = gcnew String("sRN LMDscandata");
-	//String^ ResponseData;
 	Client = gcnew TcpClient(hostName, portNumber);
 	Client->NoDelay = true;
 	Client->ReceiveTimeout = 500;//ms
@@ -32,7 +29,6 @@ int Laser::connect(String^ hostName, int portNumber)
 	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	// Print the received string on the screen
 	Console::WriteLine(ResponseData);
-
 	return 1;
 }
 int Laser::setupSharedMemory()
@@ -51,7 +47,6 @@ int Laser::setupSharedMemory()
 	LsObj->SMCreate();
 	LsObj->SMAccess();
 	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
-
 	return 1;
 }
 int Laser::getData()
@@ -68,15 +63,10 @@ int Laser::getData()
 	// Convert incoming data from an array of unsigned char bytes to an ASCII string
 	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	// Print the received string on the screen
-	//Console::WriteLine(ResponseData);
-	array<String^>^ StringArray = ResponseData->Split(' ');
-	double StartAngle = System::Convert::ToInt32(StringArray[23], 16);
-	double Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
-	int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
-	//Console::WriteLine(StartAngle);
-	//Console::WriteLine(Res);
-	//Console::WriteLine(NumRanges);
-
+	StringArray = ResponseData->Split(' ');
+	StartAngle = System::Convert::ToInt32(StringArray[23], 16);
+	Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
+	NumRanges =  System::Convert::ToInt32(StringArray[25], 16);
 	return 1;
 }
 int Laser::checkData()
@@ -90,15 +80,12 @@ int Laser::sendDataToSharedMemory()
 	array<double>^ Range = gcnew array<double>(NumRanges);
 	array<double>^ RangeX = gcnew array<double>(NumRanges);
 	array<double>^ RangeY = gcnew array<double>(NumRanges);
-
 	for (int i = 0; i < NumRanges; i++) {
 		Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
 		LsPtr->x[i] = Range[i] * sin(i * Res);
 		LsPtr->y[i] = Range[i] * sin(i * Res);
-	}
-	for (int i = 0; i < NumRanges; i++) {
 		Sleep(10);
-		Console::WriteLine("range: {0, 12:F3} {1, 12:F3}", LsPtr->x[i], LsPtr->y[i]);
+		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}",i, LsPtr->x[i], LsPtr->y[i]);
 	}
 	return 1;
 }
@@ -107,14 +94,12 @@ bool Laser::getShutdownFlag()
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	if (PMSMPtr->Shutdown.Status == 0xFF || PMSMPtr->Shutdown.Status == 0x01)
-		return 3;
+		return 1;
 	if ((timePtr->Laser - timePtr->PM) > (PMSMPtr->LifeCounter)) {
-		Console::WriteLine(timePtr->Laser - timePtr->PM);
 		Console::WriteLine("PM died");
-		return 3;
+		return 1;
 	}
-
-	return 1;
+	return 0;
 }
 int Laser::setHeartbeat()
 {
@@ -123,10 +108,8 @@ int Laser::setHeartbeat()
 	if (PMSMPtr->Heartbeat.Flags.Laser == 0)
 		PMSMPtr->Heartbeat.Flags.Laser = 1;
 	timePtr->Laser = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
-	Console::WriteLine(timePtr->Laser);
-	Sleep(100);
+	Sleep(50);
 	Console::WriteLine("Laser time stamp    : {0,12:F3} {1,12:X8}", timePtr->Laser, PMSMPtr->Shutdown.Status);
-
 	return 1;
 }
 Laser::~Laser()
@@ -139,32 +122,32 @@ Laser::~Laser()
 }
 
 
-unsigned long CRC32Value(int i)
-{
-	int j;
-	unsigned long ulCRC;
-	ulCRC = i;
-	for (j = 8; j > 0; j--)
-	{
-		if (ulCRC & 1)
-			ulCRC = (ulCRC >> 1) ^ CRC32_POLYNOMIAL;
-		else
-			ulCRC >>= 1;
-	}
-	return ulCRC;
-}
-
-unsigned long CalculateBlockCRC32(unsigned long ulCount, /* Number of bytes in the data block */
-	unsigned char* ucBuffer) /* Data block */
-{
-	unsigned long ulTemp1;
-	unsigned long ulTemp2;
-	unsigned long ulCRC = 0;
-	while (ulCount-- != 0)
-	{
-		ulTemp1 = (ulCRC >> 8) & 0x00FFFFFFL;
-		ulTemp2 = CRC32Value(((int)ulCRC ^ *ucBuffer++) & 0xff);
-		ulCRC = ulTemp1 ^ ulTemp2;
-	}
-	return(ulCRC);
-}
+//unsigned long CRC32Value(int i)
+//{
+//	int j;
+//	unsigned long ulCRC;
+//	ulCRC = i;
+//	for (j = 8; j > 0; j--)
+//	{
+//		if (ulCRC & 1)
+//			ulCRC = (ulCRC >> 1) ^ CRC32_POLYNOMIAL;
+//		else
+//			ulCRC >>= 1;
+//	}
+//	return ulCRC;
+//}
+//
+//unsigned long CalculateBlockCRC32(unsigned long ulCount, /* Number of bytes in the data block */
+//	unsigned char* ucBuffer) /* Data block */
+//{
+//	unsigned long ulTemp1;
+//	unsigned long ulTemp2;
+//	unsigned long ulCRC = 0;
+//	while (ulCount-- != 0)
+//	{
+//		ulTemp1 = (ulCRC >> 8) & 0x00FFFFFFL;
+//		ulTemp2 = CRC32Value(((int)ulCRC ^ *ucBuffer++) & 0xff);
+//		ulCRC = ulTemp1 ^ ulTemp2;
+//	}
+//	return(ulCRC);
+//}
