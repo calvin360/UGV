@@ -90,6 +90,7 @@ int Laser::sendDataToSharedMemory()
 	array<double>^ RangeY = gcnew array<double>(NumRanges);
 
 	for (int i = 0; i < NumRanges; i++) {
+		SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
 		Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
 		LsPtr->x[i] = Range[i] * sin(i * Res);
 		LsPtr->y[i] = Range[i] * sin(i * Res);
@@ -98,6 +99,8 @@ int Laser::sendDataToSharedMemory()
 }
 bool Laser::getShutdownFlag()
 {
+	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
+	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	if (PMSMPtr->Shutdown.Status == 0xFF || PMSMPtr->Shutdown.Status == 0x01)
 		return 3;
 	if ((timePtr->Laser - timePtr->PM) > (PMSMPtr->LifeCounter)) {
@@ -110,6 +113,8 @@ bool Laser::getShutdownFlag()
 }
 int Laser::setHeartbeat()
 {
+	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
+	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	if (PMSMPtr->Heartbeat.Flags.Laser == 0)
 		PMSMPtr->Heartbeat.Flags.Laser = 1;
 	timePtr->Laser = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
@@ -121,6 +126,9 @@ int Laser::setHeartbeat()
 }
 Laser::~Laser()
 {
+	delete tObj;
+	delete PMObj;
+	delete LsObj;
 	Stream->Close();
 	Client->Close();
 }
