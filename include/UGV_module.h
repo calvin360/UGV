@@ -76,9 +76,6 @@ ref class UGV_module
 		SMObject* tObj;	// Filled in setupSharedMemory(). For accessing PM shared Memory
 		SMObject* PMObj;				// Filled in setupSharedMemory(). For storing sensory data to shared Memory
 		SMObject* LsObj;
-		//timeStamps* timePtr;
-		//ProcessManagement* PMSMPtr; 
-		//SM_Laser* LsPtr;
 };
 
 #endif 

@@ -57,6 +57,7 @@ int Laser::setupSharedMemory()
 int Laser::getData()
 {
 	// Write command asking for data
+	NetworkStream^ Stream = Client->GetStream();
 	Stream->WriteByte(0x02);
 	Stream->Write(SendData, 0, SendData->Length);
 	Stream->WriteByte(0x03);
@@ -85,15 +86,18 @@ int Laser::checkData()
 }
 int Laser::sendDataToSharedMemory()
 {
+	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
 	array<double>^ Range = gcnew array<double>(NumRanges);
 	array<double>^ RangeX = gcnew array<double>(NumRanges);
 	array<double>^ RangeY = gcnew array<double>(NumRanges);
 
 	for (int i = 0; i < NumRanges; i++) {
-		SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
 		Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
 		LsPtr->x[i] = Range[i] * sin(i * Res);
 		LsPtr->y[i] = Range[i] * sin(i * Res);
+	}
+	for (int i = 0; i < NumRanges; i++) {
+		Console::WriteLine("range: {0, 12:F3} {1, 12:F3}", LsPtr->x[i], LsPtr->y[i]);
 	}
 	return 1;
 }
