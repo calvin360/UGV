@@ -97,6 +97,7 @@ int Laser::sendDataToSharedMemory()
 		LsPtr->y[i] = Range[i] * sin(i * Res);
 	}
 	for (int i = 0; i < NumRanges; i++) {
+		Sleep(10);
 		Console::WriteLine("range: {0, 12:F3} {1, 12:F3}", LsPtr->x[i], LsPtr->y[i]);
 	}
 	return 1;
