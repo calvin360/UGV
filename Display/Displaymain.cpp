@@ -59,8 +59,8 @@ void mouse(int button, int state, int x, int y);
 void dragged(int x, int y);
 void motion(int x, int y);
 
-void drawLaser();
-void addLine(double x, double y);
+//void drawLaser();
+//void addLine(double x, double y);
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -79,14 +79,10 @@ double speed = 0;
 double steering = 0;
 
 
+//making SM global
 timeStamps* time1;
 ProcessManagement* PM;
-
-//making SM global
-SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));
-SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
-SM_Laser* LsPtr = nullptr;
+SM_Laser* Ls;
 
 //int _tmain(int argc, _TCHAR* argv[]) {
 int main(int argc, char ** argv) {
@@ -94,20 +90,24 @@ int main(int argc, char ** argv) {
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
-
+SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));
+SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
+timeStamps* timePtr = nullptr;
+ProcessManagement* PMSMPtr = nullptr;
+SM_Laser* LsPtr = nullptr;
 	tObj.SMCreate();
 	tObj.SMAccess();
-	timeStamps* timePtr = (timeStamps*)tObj.pData;
+	timePtr = (timeStamps*)tObj.pData;
 	time1 = timePtr;
-
 	PMObj.SMCreate();
 	PMObj.SMAccess();
-	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
+	PMSMPtr = (ProcessManagement*)PMObj.pData;
 	PM = PMSMPtr;
-
 	LsObj.SMCreate();
 	LsObj.SMAccess();
-	SM_Laser* LsPtr = (SM_Laser*)LsObj.pData;
+	LsPtr = (SM_Laser*)LsObj.pData;
+	Ls = LsPtr;
 
 	glutInit(&argc, (char**)(argv));
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
@@ -116,7 +116,6 @@ int main(int argc, char ** argv) {
 	glutCreateWindow("MTRN3500 - GL");
 
 	Camera::get()->setWindowDimensions(WINDOW_WIDTH, WINDOW_HEIGHT);
-
 	glEnable(GL_DEPTH_TEST);
 
 	glutDisplayFunc(display);
@@ -156,7 +155,7 @@ void display() {
 	// -------------------------------------------------------------------------
 	//  This method is the main draw routine. 
 	// -------------------------------------------------------------------------
-
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -180,9 +179,9 @@ void display() {
 
 	}
 
-
 	// draw HUD
 	HUD::Draw();
+	drawLaser();
 
 	glutSwapBuffers();
 };
@@ -215,9 +214,8 @@ double getTime()
 }
 
 void idle() {
-
 		if (PM->Heartbeat.Flags.Display == 0)
-			PM->Heartbeat.Flags.Display == 1;
+			PM->Heartbeat.Flags.Display = 1;
 		time1->Display = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine(time1->Display);
 		Console::WriteLine("Display time stamp    : {0,12:F3} {1,12:X8}", time1->Display, PM->Shutdown.Status);
@@ -230,12 +228,6 @@ void idle() {
 		else if (_kbhit()) 
 			exit(-1);
 
-		/*	did pm put flag down
-				true->put flag up
-				false->is pm time stamp older by agreed time gap*/
-				//true-> shutdown all
-	
-	
 
 	if (KeyManager::get()->isAsciiKeyPressed('a')) {
 		Camera::get()->strafeLeft();
@@ -294,9 +286,8 @@ void idle() {
 	if (vehicle != NULL) {
 		vehicle->update(speed, steering, elapsedTime);
 	}
-
 	display();
-
+	//Sleep(9000);
 #ifdef _WIN32 
 	Sleep(sleep_time_between_frames_in_seconds * 1000);
 #else
@@ -371,8 +362,8 @@ void drawLaser() {
 	glLineWidth(2.5);
 	glColor3f(1.0, 1.0, 1.0);
 	glBegin(GL_LINES);
-	for (int i = 0; i < LsPtr->num; i++) {
-		addLine(LsPtr->x[i] / 1000.0, LsPtr->y[i] / 1000.0);
+	for (int i = 0; i < Ls->num; i++) {
+		addLine(Ls->x[i] / 1000.0, Ls->y[i] / 1000.0);
 	}
 	glEnd();
 	glPopMatrix();

@@ -51,11 +51,11 @@ struct SM_GPS
 struct UnitFlags
 {
 	unsigned char	Laser : 1,				//CRITICAL
-		Display : 1,			//CRITICAL
-		Camera : 1,				//CRITICAL
-		VehicleControl : 1,		//NONCRITICAL
-		GPS : 1,				//NONCRITICAL
-		Garbage : 3;			//filler padding
+					Display : 1,			//CRITICAL
+					Camera : 1,				//CRITICAL
+					VehicleControl : 1,		//NONCRITICAL
+					GPS : 1,				//NONCRITICAL
+					Garbage : 3;			//filler padding
 };
 
 union ExecFlags
