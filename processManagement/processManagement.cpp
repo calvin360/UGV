@@ -53,7 +53,6 @@ int main()
 	timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	//start all 5 modules
 	StartProcesses();
-	//Sleep(100);
 	while (!_kbhit()) {
 		timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine("PM time stamp    : {0,12:F3} {1,12:X8}", timePtr->PM, PMSMPtr->Shutdown.Status);
@@ -61,7 +60,7 @@ int main()
 		Console::WriteLine("GPS time stamp    : {0,12:F3} {1,12:X8}", timePtr->GPS, PMSMPtr->Shutdown.Status);
 		Console::WriteLine("Life    : {0,12:F3} {1,12:X8}", (timePtr->PM - timePtr->Display), PMSMPtr->Shutdown.Status);
 		std::cout << PMSMPtr->LifeCounter << std::endl;
-		Sleep(1000);
+		Sleep(100);
 		//checking crit processes
 		if ((CRITICALMASK & PMSMPtr->Heartbeat.Status) == CRITICALMASK) {
 			PMSMPtr->Heartbeat.Flags.Laser = 0;
@@ -100,9 +99,6 @@ int main()
 		if (PMSMPtr->Shutdown.Status == 0xFF)
 			break;
 	
-		/*timeStampsSMPtr->PMTimeStamp = 599.034;
-		Sleep(50);
-		if (_kbhit()) break;*/
 		//check system health
 		//if ((CRITICALMASK & PMSMPtr->Heartbeat.Status) != CRITICALMASK) {
 		//	//check which heartbeat is not working

@@ -59,6 +59,9 @@ void mouse(int button, int state, int x, int y);
 void dragged(int x, int y);
 void motion(int x, int y);
 
+void drawLaser();
+void addLine(double x, double y);
+
 using namespace System;
 using namespace System::Diagnostics;
 using namespace System::Threading;
@@ -79,22 +82,32 @@ double steering = 0;
 timeStamps* time1;
 ProcessManagement* PM;
 
+//making SM global
+SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));
+SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
+SM_Laser* LsPtr = nullptr;
+
 //int _tmain(int argc, _TCHAR* argv[]) {
 int main(int argc, char ** argv) {
 
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
-	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
+
 	tObj.SMCreate();
 	tObj.SMAccess();
 	timeStamps* timePtr = (timeStamps*)tObj.pData;
 	time1 = timePtr;
-	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+
 	PMObj.SMCreate();
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
 	PM = PMSMPtr;
+
+	LsObj.SMCreate();
+	LsObj.SMAccess();
+	SM_Laser* LsPtr = (SM_Laser*)LsObj.pData;
 
 	glutInit(&argc, (char**)(argv));
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
@@ -351,4 +364,21 @@ void motion(int x, int y) {
 	prev_mouse_y = y;
 };
 
+void drawLaser() {
+	glPushMatrix();
+	vehicle->positionInGL();
+	glTranslated(0.5, 0, 0); // move reference frame to lidar
+	glLineWidth(2.5);
+	glColor3f(1.0, 1.0, 1.0);
+	glBegin(GL_LINES);
+	for (int i = 0; i < LsPtr->num; i++) {
+		addLine(LsPtr->x[i] / 1000.0, LsPtr->y[i] / 1000.0);
+	}
+	glEnd();
+	glPopMatrix();
+}
 
+void addLine(double x, double y) {
+	glVertex3f(x, 0.3, y);
+	glVertex3f(x, 1.0, y);
+}

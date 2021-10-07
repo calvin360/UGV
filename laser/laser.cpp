@@ -1,5 +1,7 @@
 #include "Laser.h"
 
+#define PI 3.14159265
+
 using namespace System;
 using namespace System::Diagnostics;
 using namespace System::Threading;
@@ -51,6 +53,7 @@ int Laser::setupSharedMemory()
 }
 int Laser::getData()
 {
+	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
 	// Write command asking for data
 	NetworkStream^ Stream = Client->GetStream();
 	Stream->WriteByte(0x02);
@@ -66,26 +69,31 @@ int Laser::getData()
 	StringArray = ResponseData->Split(' ');
 	StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
-	NumRanges =  System::Convert::ToInt32(StringArray[25], 16);
+	LsPtr->num =  System::Convert::ToInt32(StringArray[25], 16);
 	return 1;
 }
 int Laser::checkData()
 {
-	// YOUR CODE HERE
-	return 1;
+	if (StringArray[1] == "LMDscandata") {
+		Console::WriteLine("Good data");
+		return 1;
+	}
+	else {
+		Console::WriteLine("Bad data");
+		return 0;
+	}
 }
 int Laser::sendDataToSharedMemory()
 {
 	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
-	array<double>^ Range = gcnew array<double>(NumRanges);
-	array<double>^ RangeX = gcnew array<double>(NumRanges);
-	array<double>^ RangeY = gcnew array<double>(NumRanges);
-	for (int i = 0; i < NumRanges; i++) {
+	array<double>^ Range = gcnew array<double>(LsPtr->num);
+	array<double>^ RangeX = gcnew array<double>(LsPtr->num);
+	array<double>^ RangeY = gcnew array<double>(LsPtr->num);
+	for (int i = 0; i < LsPtr->num; i++) {
 		Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
-		LsPtr->x[i] = Range[i] * sin(i * Res);
-		LsPtr->y[i] = Range[i] * sin(i * Res);
-		Sleep(10);
-		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}",i, LsPtr->x[i], LsPtr->y[i]);
+		LsPtr->x[i] = Range[i] * sin(i * Res * PI / 180);
+		LsPtr->y[i] = Range[i] * cos(i * Res * PI / 180);
+		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}",i+1, LsPtr->x[i], LsPtr->y[i]);
 	}
 	return 1;
 }

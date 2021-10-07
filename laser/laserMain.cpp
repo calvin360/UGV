@@ -19,10 +19,11 @@ int main(void) {
 
 	while (!_kbhit()) {
 		myLaser.setHeartbeat();
-		if (myLaser.getShutdownFlag() == 1) {
+		if (myLaser.getShutdownFlag() == 1) 
 			break;
-		}
 		myLaser.getData();
+		if (myLaser.checkData() == 0)
+			break;
 		myLaser.sendDataToSharedMemory();
 	}
 
