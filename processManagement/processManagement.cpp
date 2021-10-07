@@ -45,10 +45,12 @@ int main()
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
 	PMSMPtr->Heartbeat.Status = 0x00; //set low by default 
 	//wait time for unresponsive processes (seconds)
-	PMSMPtr->LifeCounter = 1;
+	PMSMPtr->LifeCounter = 3;
 	timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	//start all 5 modules
 	StartProcesses();
+	Sleep(10);
+	PMSMPtr->LifeCounter = 1;
 	while (!_kbhit()) {
 		timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine("PM time stamp    : {0,12:F3} {1,12:X8}", timePtr->PM, PMSMPtr->Shutdown.Status);
