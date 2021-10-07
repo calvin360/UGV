@@ -71,9 +71,8 @@ ref class UGV_module
 		array<String^>^ StringArray;
 		double StartAngle;
 		double Res;
-		int NumRanges;
 
-		SMObject* tObj;	// Filled in setupSharedMemory(). For accessing PM shared Memory
+		SMObject* tObj;					// Filled in setupSharedMemory(). For accessing PM shared Memory
 		SMObject* PMObj;				// Filled in setupSharedMemory(). For storing sensory data to shared Memory
 		SMObject* LsObj;
 };

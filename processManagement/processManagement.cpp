@@ -39,17 +39,13 @@ int main()
 	tObj.SMCreate();
 	tObj.SMAccess();
 	timeStamps* timePtr = (timeStamps*)tObj.pData;
-	/*array<String^>^ ModuleList = gcnew array<String^>{"ProcessManagement", "Laser", "Display", "Camera", "VehicleControl", "GPS" };
-	array<int^> Critcal = gcnew array<int>(ModuleList->Length) { 1, 1, 1, 1, 0, 0 };
-	array<Process^>^ processList = gcnew array<Process^>(ModuleList->Length);*/
-	//ProcessManagement* PMSMPtr = nullptr;
 	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
 	PMObj.SMCreate();
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
-	PMSMPtr->Heartbeat.Status = 0x07; 
+	PMSMPtr->Heartbeat.Status = 0x00; //set low by default 
 	//wait time for unresponsive processes (seconds)
-	PMSMPtr->LifeCounter = 3;
+	PMSMPtr->LifeCounter = 1;
 	timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	//start all 5 modules
 	StartProcesses();
@@ -161,8 +157,6 @@ int main()
 	//	//else std::cout << "zero" << std::endl;
 
 	//	}
-
-	Console::WriteLine(NONCRITICALMASK);
 	Console::WriteLine("Process management terminated normally.");
 	Sleep(1000);
 	return 0;

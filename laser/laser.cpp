@@ -8,8 +8,6 @@ using namespace System::Threading;
 
 int Laser::connect(String^ hostName, int portNumber)
 {
-	// Pointer to TcpClent type object on managed heap
-	// arrays of unsigned chars to send and receive data
 	String^ AskScan = gcnew String("sRN LMDscandata");
 	Client = gcnew TcpClient(hostName, portNumber);
 	Client->NoDelay = true;

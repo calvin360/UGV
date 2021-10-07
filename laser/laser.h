@@ -3,10 +3,8 @@
 #include <smstructs.h>
 #include <SMObject.h>
 
-#define CRC32_POLYNOMIAL 0xEDB88320L
-
-unsigned long CRC32Value(int i);
-unsigned long CalculateBlockCRC32(unsigned long ulCount, unsigned char* ucBuffer);
+//unsigned long CRC32Value(int i);
+//unsigned long CalculateBlockCRC32(unsigned long ulCount, unsigned char* ucBuffer);
 
 ref class Laser : public UGV_module
 {
