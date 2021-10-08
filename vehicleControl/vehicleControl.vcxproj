@@ -115,6 +115,10 @@
   <ItemGroup>
     <ClCompile Include="..\SMObject.cpp" />
     <ClCompile Include="VC.cpp" />
+    <ClCompile Include="VCmain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="VC.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
