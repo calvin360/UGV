@@ -74,10 +74,12 @@ int Laser::checkData()
 {
 	if (StringArray[1] == "LMDscandata") {
 		Console::WriteLine("Good data");
+		Sleep(100);
 		return 1;
 	}
 	else {
 		Console::WriteLine("Bad data");
+		Sleep(100);
 		return 0;
 	}
 }

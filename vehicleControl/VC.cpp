@@ -101,7 +101,7 @@ bool VC::getShutdownFlag()
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	if (PMSMPtr->Shutdown.Status == 0xFF || PMSMPtr->Shutdown.Status == 0x01)
 		return 1;
-	if ((timePtr->VC - timePtr->PM) > (PMSMPtr->LifeCounter)) {
+	if ((timePtr->VehicleControl - timePtr->PM) > (PMSMPtr->LifeCounter)) {
 		Console::WriteLine("PM died");
 		return 1;
 	}
@@ -111,9 +111,9 @@ int VC::setHeartbeat()
 {
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
-	if (PMSMPtr->Heartbeat.Flags.VC == 0)
-		PMSMPtr->Heartbeat.Flags.VC = 1;
-	timePtr->VC = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
+	if (PMSMPtr->Heartbeat.Flags.VehicleControl == 0)
+		PMSMPtr->Heartbeat.Flags.VehicleControl = 1;
+	timePtr->VehicleControl = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	Sleep(50);
 	Console::WriteLine("VC time stamp    : {0,12:F3} {1,12:X8}", timePtr->VehicleControl, PMSMPtr->Shutdown.Status);
 	return 1;

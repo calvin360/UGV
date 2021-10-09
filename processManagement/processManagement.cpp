@@ -16,7 +16,7 @@ using namespace System::Net::Sockets;
 using namespace System::Net;
 using namespace System::Text;
 
-#define NUM_UNITS 2
+#define NUM_UNITS 3
 
 bool IsProcessRunning(const char* processName);
 void StartProcesses();
@@ -68,9 +68,19 @@ int main()
 			Console::WriteLine("crit reset");
 		}
 		//kill all if any crit process has timed out
-		else if ((timePtr->PM - timePtr->Camera > PMSMPtr->LifeCounter) || (timePtr->PM - timePtr->Display > PMSMPtr->LifeCounter) || (timePtr->PM - timePtr->Laser > PMSMPtr->LifeCounter)) {
+		else if ((timePtr->PM - timePtr->Camera > PMSMPtr->LifeCounter)) {
 			PMSMPtr->Shutdown.Status = 0xFF;
-			Console::WriteLine("Weeder shutdown {0,8:F8}", PMSMPtr->Shutdown.Status);
+			Console::WriteLine("camera shutdown {0,8:F8}", PMSMPtr->Shutdown.Status);
+			break;
+		}
+		else if ((timePtr->PM - timePtr->Display > PMSMPtr->LifeCounter)) {
+			PMSMPtr->Shutdown.Status = 0xFF;
+			Console::WriteLine("display shutdown {0,8:F8}", PMSMPtr->Shutdown.Status);
+			break;
+		}
+		else if ((timePtr->PM - timePtr->Laser > PMSMPtr->LifeCounter)) {
+			PMSMPtr->Shutdown.Status = 0xFF;
+			Console::WriteLine("laser shutdown {0,8:F8}", PMSMPtr->Shutdown.Status);
 			break;
 		}
 		//checking noncrit processes
@@ -99,7 +109,7 @@ int main()
 			break;
 	}
 	Console::WriteLine("Process management terminated normally.");
-	Sleep(1000);
+	Sleep(9000);
 	return 0;
 }
 

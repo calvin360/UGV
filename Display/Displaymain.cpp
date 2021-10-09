@@ -59,8 +59,8 @@ void mouse(int button, int state, int x, int y);
 void dragged(int x, int y);
 void motion(int x, int y);
 
-//void drawLaser();
-//void addLine(double x, double y);
+void drawLaser();
+void addLine(double x, double y);
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -184,6 +184,7 @@ void display() {
 	drawLaser();
 
 	glutSwapBuffers();
+	//Sleep(10000);
 };
 
 void reshape(int width, int height) {
@@ -214,15 +215,20 @@ double getTime()
 }
 
 void idle() {
-		if (PM->Heartbeat.Flags.Display == 0)
+	if (PM->Heartbeat.Flags.Display == 0) {
 			PM->Heartbeat.Flags.Display = 1;
+			Console::WriteLine("display reset");
+		}
 		time1->Display = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine(time1->Display);
 		Console::WriteLine("Display time stamp    : {0,12:F3} {1,12:X8}", time1->Display, PM->Shutdown.Status);
-		if (PM->Shutdown.Status == 0xFF || PM->Shutdown.Status == 0x03)
+		if (PM->Shutdown.Status == 0xFF || PM->Shutdown.Status == 0x03) {
+			//Sleep(9000);
 			exit(-1);
+		}
 		else if ((time1->Display - time1->PM) > (PM->LifeCounter)) {
 			Console::WriteLine("PM died");
+			Sleep(9000);
 			exit(-1);
 		}
 		else if (_kbhit()) 
@@ -356,17 +362,19 @@ void motion(int x, int y) {
 };
 
 void drawLaser() {
-	glPushMatrix();
-	vehicle->positionInGL();
-	glTranslated(0.5, 0, 0); // move reference frame to lidar
-	glLineWidth(2.5);
-	glColor3f(1.0, 1.0, 1.0);
-	glBegin(GL_LINES);
+	//glPushMatrix();
+	//vehicle->positionInGL();
+	//glTranslated(0.5, 0, 0); // move reference frame to lidar
+	//glLineWidth(2.5);
+	//glColor3f(1.0, 1.0, 1.0);
+	//glBegin(GL_LINES);
 	for (int i = 0; i < Ls->num; i++) {
 		addLine(Ls->x[i] / 1000.0, Ls->y[i] / 1000.0);
+		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, Ls->x[i], Ls->y[i]);
 	}
-	glEnd();
-	glPopMatrix();
+	
+	//glEnd();
+	//glPopMatrix();
 }
 
 void addLine(double x, double y) {
