@@ -228,7 +228,7 @@ void idle() {
 		}
 		else if ((time1->Display - time1->PM) > (PM->LifeCounter)) {
 			Console::WriteLine("PM died");
-			Sleep(9000);
+			//Sleep(9000);
 			exit(-1);
 		}
 		else if (_kbhit()) 
