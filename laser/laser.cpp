@@ -67,18 +67,21 @@ int Laser::getData()
 	StringArray = ResponseData->Split(' ');
 	StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
-	LsPtr->num =  System::Convert::ToInt32(StringArray[25], 16);
+	LsPtr->num = System::Convert::ToInt32(StringArray[25], 16);
 	return 1;
 }
 int Laser::checkData()
 {
 	if (StringArray[1] == "LMDscandata") {
 		Console::WriteLine("Good data");
+		Console::WriteLine(StringArray[1]);
+
 		Sleep(100);
 		return 1;
 	}
 	else {
 		Console::WriteLine("Bad data");
+		Console::WriteLine(StringArray[1]);
 		Sleep(100);
 		return 0;
 	}
@@ -93,7 +96,7 @@ int Laser::sendDataToSharedMemory()
 		Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
 		LsPtr->x[i] = Range[i] * sin(i * Res * PI / 180);
 		LsPtr->y[i] = Range[i] * cos(i * Res * PI / 180);
-		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}",i+1, LsPtr->x[i], LsPtr->y[i]);
+		Console::WriteLine("Range: {0, 12:F3} {1, 12:F3} {2, 12:F3}",i+1, LsPtr->x[i], LsPtr->y[i]);
 	}
 	return 1;
 }

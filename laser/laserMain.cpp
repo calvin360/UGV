@@ -22,9 +22,8 @@ int main(void) {
 		if (myLaser.getShutdownFlag() == 1) 
 			break;
 		myLaser.getData();
-		if (myLaser.checkData() == 0)
-			break;
-		myLaser.sendDataToSharedMemory();
+		if (myLaser.checkData() == 1) 
+			myLaser.sendDataToSharedMemory();
 	}
 
 	Console::WriteLine("Laser process ended");

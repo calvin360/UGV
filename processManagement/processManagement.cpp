@@ -49,11 +49,9 @@ int main()
 	timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	//start all 5 modules
 	StartProcesses();
-	//Sleep(10);
-	//PMSMPtr->LifeCounter = 3;
+	Sleep(10);
+	PMSMPtr->LifeCounter = 1;
 	while (!_kbhit()) {
-		PMSMPtr->Heartbeat.Flags.Camera = 1;
-		PMSMPtr->Heartbeat.Flags.Laser = 1;
 		timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine("PM time stamp    : {0,12:F3} {1,12:X8}", timePtr->PM, PMSMPtr->Shutdown.Status);
 		Console::WriteLine("Laser time stamp    : {0,12:F3} {1,12:X8}", timePtr->Laser, PMSMPtr->Shutdown.Status);
@@ -109,7 +107,7 @@ int main()
 			break;
 	}
 	Console::WriteLine("Process management terminated normally.");
-	Sleep(9000);
+	Sleep(1000);
 	return 0;
 }
 
