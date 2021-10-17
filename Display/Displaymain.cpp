@@ -362,19 +362,18 @@ void motion(int x, int y) {
 };
 
 void drawLaser() {
-	//glPushMatrix();
-	//vehicle->positionInGL();
-	//glTranslated(0.5, 0, 0); // move reference frame to lidar
-	//glLineWidth(2.5);
-	//glColor3f(1.0, 1.0, 1.0);
-	//glBegin(GL_LINES);
+	glPushMatrix();
+	vehicle->positionInGL();
+	glTranslated(0.5, 0, 0); // move reference frame to lidar
+	glLineWidth(1.0);
+	glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_LINES);
 	for (int i = 0; i < Ls->num; i++) {
 		addLine(Ls->x[i] / 1000.0, Ls->y[i] / 1000.0);
-		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, Ls->x[i], Ls->y[i]);
+		//Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, Ls->x[i], Ls->y[i]);
 	}
-	
-	//glEnd();
-	//glPopMatrix();
+	glEnd();
+	glPopMatrix();
 }
 
 void addLine(double x, double y) {
