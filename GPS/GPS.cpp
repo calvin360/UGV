@@ -11,16 +11,15 @@ int GPS::connect(String^ hostName, int portNumber)
 {
 	// Pointer to TcpClent type object on managed heap
 	Client1 = gcnew TcpClient(hostName, portNumber);
-	// arrays of unsigned chars to send and receive data
-	array<unsigned char>^ SendData1;
-	array<unsigned char>^ ReadData1;
-	String^ ResponseData1;
-	Client1 = gcnew TcpClient(hostName, portNumber);
 	Client1->NoDelay = true;
 	Client1->ReceiveTimeout = 500;//ms
 	Client1->SendTimeout = 500;//ms
 	Client1->ReceiveBufferSize = 1024;
 	Client1->SendBufferSize = 1024;
+	// arrays of unsigned chars to send and receive data
+	array<unsigned char>^ SendData1;
+	array<unsigned char>^ ReadData1;
+	String^ ResponseData1;
 
 
 	//SerialPort^ Port = nullptr;
