@@ -5,6 +5,8 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 using namespace System::IO::Ports;
 
+//SM_GPSData NovatelGPS;
+
 int GPS::connect(String^ hostName, int portNumber)
 {
 	// Pointer to TcpClent type object on managed heap
@@ -54,11 +56,16 @@ int GPS::setupSharedMemory()
 	PMObj->SMCreate();
 	PMObj->SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
-	//SM for GPS
+	//SM for GPS dump
 	GPSObj = new SMObject(_TEXT("SM_GPS"), sizeof(SM_GPS));
 	GPSObj->SMCreate();
 	GPSObj->SMAccess();
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
+	//SM for GPS data
+	GPSDataObj = new SMObject(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
+	GPSDataObj->SMCreate();
+	GPSDataObj->SMAccess();
+	SM_GPSData* GPSData = (SM_GPSData*)GPSDataObj->pData;
 	return 1;
 }
 int GPS::getData()
@@ -96,6 +103,7 @@ int GPS::getData()
 			*(BytePtr++) = ResponseData1[i];
 		}
 	}
+	Console::WriteLine("{0:F3}", GPSPtr->easting);
 
 	return 1;
 }
@@ -104,24 +112,24 @@ int GPS::checkData()
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	// Check CRC is correct
 	unsigned long CRC = (unsigned long)GPSPtr->checkSum;
-	unsigned long calcCRC = CalculateBlockCRC32(sizeof(SM_GPS) - 4, (unsigned char*)GPSPtr);
+	//unsigned long calcCRC = CalculateBlockCRC32(sizeof(SM_GPS) - 4, (unsigned char*)GPSPtr);
 
-	if (CRC == calcCRC) {
-		// Print GPS data
-		Console::Write("northing: {0,8:N3}\t", GPSPtr->northing);
-		Console::Write("easting: {0,9:N3}\t", GPSPtr->easting);
-		Console::Write("height: {0,10:N3}\t", GPSPtr->height);
-		Console::Write("checksum: {0,8}\t", CRC);
-		Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
+	//if (CRC == calcCRC) {
+	//	// Print GPS data
+	//	Console::Write("northing: {0,8:N3}\t", GPSPtr->northing);
+	//	Console::Write("easting: {0,9:N3}\t", GPSPtr->easting);
+	//	Console::Write("height: {0,10:N3}\t", GPSPtr->height);
+	//	Console::Write("checksum: {0,8}\t", CRC);
+	//	Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
 	return 1;
 }
 int GPS::sendDataToSharedMemory()
 {
-	int n = GPSSMObjPtr->numData;
-	GPSSMObjPtr->northing[n] = GPSDataPtr->northing;
-	GPSSMObjPtr->easting[n] = GPSDataPtr->easting;
-	GPSSMObjPtr->height[n] = GPSDataPtr->height;
-	GPSSMObjPtr->numData++;
+	//int n = GPSPtr->numData;
+	//GPSPtr->northing[n] = NovatelGPS->northing;
+	//GPSPtr->easting[n] = NovatelGPS->easting;
+	//GPSPtr->height[n] = NovatelGPS->height;
+	//GPSPtr->numData++;
 	return 1;
 }
 bool GPS::getShutdownFlag()
@@ -145,12 +153,14 @@ int GPS::setHeartbeat()
 		timePtr->GPS = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine(timePtr->GPS);
 		Sleep(50);
+		return 1;
 }
 GPS::~GPS()
 {
 	delete tObj;
 	delete PMObj;
 	delete GPSObj;
+	delete GPSDataObj;
 	Stream->Close();
 	Client->Close();
 }

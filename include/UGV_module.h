@@ -87,6 +87,7 @@ ref class UGV_module
 		SMObject* PMObj;				// Filled in setupSharedMemory(). For storing sensory data to shared Memory
 		SMObject* LsObj;
 		SMObject* GPSObj;
+		SMObject* GPSDataObj;
 };
 
 #endif 

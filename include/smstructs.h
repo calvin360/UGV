@@ -40,7 +40,7 @@ struct SM_VehicleControl
 	double Speed;
 	double Steering;
 };
-
+//dump entitre good data here
 struct SM_GPS
 {
 	unsigned int Header;
@@ -50,6 +50,15 @@ struct SM_GPS
 	double height;
 	unsigned char Discards2[40];
 	unsigned int checkSum;
+
+};
+//put headings here
+struct SM_GPSData
+{
+	double northing[1000];
+	double easting[1000];
+	double height[1000];
+	int numData;
 };
 
 struct UnitFlags
