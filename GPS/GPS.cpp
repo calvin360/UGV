@@ -21,7 +21,7 @@ int GPS::connect(String^ hostName, int portNumber)
 	Client1->SendTimeout = 500;//ms
 	Client1->ReceiveBufferSize = 1024;
 	Client1->SendBufferSize = 1024;
-	NetworkStream^ Stream1 = Client1->GetStream();
+
 
 	//SerialPort^ Port = nullptr;
 	//String^ PortName = nullptr;
@@ -87,7 +87,8 @@ int GPS::getData()
 	//double StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	//double Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
 	//int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
-	Stream->Read(ReadData, 0, ReadData->Length);
+	NetworkStream^ Stream1 = Client1->GetStream();
+	Stream1->Read(ReadData1, 0, ReadData1->Length);
 	Header = 0;
 	int i = 0;
 	do {
@@ -96,7 +97,7 @@ int GPS::getData()
 
 	} while (Header != 0xaa44121c);
 	Start = i - 4;
-	
+
 	if (Header == 0xaa44121c) {
 		BytePtr = (unsigned char*)GPSPtr;
 		for (int i = Start; i < (Start + sizeof(SM_GPS)); i++) {
@@ -149,11 +150,11 @@ int GPS::setHeartbeat()
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	if (PMSMPtr->Heartbeat.Flags.GPS == 0)
-			PMSMPtr->Heartbeat.Flags.GPS = 1;
-		timePtr->GPS = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
-		Console::WriteLine(timePtr->GPS);
-		Sleep(50);
-		return 1;
+		PMSMPtr->Heartbeat.Flags.GPS = 1;
+	timePtr->GPS = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
+	Console::WriteLine(timePtr->GPS);
+	Sleep(50);
+	return 1;
 }
 GPS::~GPS()
 {
