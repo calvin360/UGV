@@ -49,7 +49,7 @@ struct SM_GPS
 	double easting;
 	double height;
 	unsigned char Discards2[40];
-	unsigned int Checksum;
+	unsigned int checkSum;
 };
 
 struct UnitFlags

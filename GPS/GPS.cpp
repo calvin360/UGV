@@ -101,7 +101,18 @@ int GPS::getData()
 }
 int GPS::checkData()
 {
+	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
+	// Check CRC is correct
+	unsigned long CRC = (unsigned long)GPSPtr->checkSum;
+	unsigned long calcCRC = CalculateBlockCRC32(sizeof(SM_GPS) - 4, (unsigned char*)GPSDataPtr);
 
+	if (CRC == calcCRC) {
+		// Print GPS data
+		Console::Write("northing: {0,8:N3}\t", GPSDataPtr->northing);
+		Console::Write("easting: {0,9:N3}\t", GPSDataPtr->easting);
+		Console::Write("height: {0,10:N3}\t", GPSDataPtr->height);
+		Console::Write("checksum: {0,8}\t", CRC);
+		Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
 	return 1;
 }
 int GPS::sendDataToSharedMemory()
@@ -119,17 +130,33 @@ int GPS::sendDataToSharedMemory()
 }
 bool GPS::getShutdownFlag()
 {
-	// YOUR CODE HERE
-	return 1;
+	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
+	timeStamps* timePtr = (timeStamps*)tObj->pData;
+	if (PMSMPtr->Shutdown.Status == 0xFF || PMSMPtr->Shutdown.Status == 0x10)
+		return 1;
+	if ((timePtr->Laser - timePtr->PM) > (PMSMPtr->LifeCounter)) {
+		Console::WriteLine("PM died");
+		return 1;
+	}
+	return 0;
 }
 int GPS::setHeartbeat()
 {
-	// YOUR CODE HERE
-	return 1;
+	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
+	timeStamps* timePtr = (timeStamps*)tObj->pData;
+	if (PMSMPtr->Heartbeat.Flags.GPS == 0)
+			PMSMPtr->Heartbeat.Flags.GPS = 1;
+		timePtr->GPS = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
+		Console::WriteLine(timePtr->GPS);
+		Sleep(50);
 }
 GPS::~GPS()
 {
-	// YOUR CODE HERE
+	delete tObj;
+	delete PMObj;
+	delete GPSObj;
+	Stream->Close();
+	Client->Close();
 }
 
 
