@@ -73,7 +73,7 @@ int Laser::getData()
 }
 int Laser::checkData()
 {
-	if (StringArray[0] == "sRN" && StringArray[1] == "LMDscandata") {
+	if (StringArray[1] == "LMDscandata") {
 		Console::WriteLine("Good data");
 		Console::WriteLine(StringArray[1]);
 
@@ -82,6 +82,7 @@ int Laser::checkData()
 	}
 	else {
 		Console::WriteLine("Bad data");
+		//Console::WriteLine(StringArray[0]);
 		Console::WriteLine(StringArray[1]);
 		Sleep(100);
 		return 0;

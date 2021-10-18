@@ -38,6 +38,11 @@ int main(void) {
 	myGPS.connect("192.168.1.200", 24000);
 
 	while (!_kbhit()) {
+		if (myGPS.getShutdownFlag() == 1)
+			break;
+		myGPS.getData();
+		//if (myGPS.checkData() == 1)
+		//	myGPS.sendDataToSharedMemory();
 		//if (PMSMPtr->Heartbeat.Flags.GPS == 0)
 		//	PMSMPtr->Heartbeat.Flags.GPS = 1;
 		//timePtr->GPS = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
@@ -50,8 +55,6 @@ int main(void) {
 		//	Console::WriteLine("PM died");
 		//	break;
 		//}
-		myGPS.getShutdownFlag();
-		myGPS.setHeartbeat();
 	}
 	Console::WriteLine("GPS process ended");
 	Sleep(1000);

@@ -103,7 +103,7 @@ int GPS::getData()
 			*(BytePtr++) = ResponseData1[i];
 		}
 	}
-	Console::WriteLine("{0:F3}", GPSPtr->easting);
+	Console::WriteLine("easting: {0:F3}", GPSPtr->easting);
 
 	return 1;
 }
@@ -138,7 +138,7 @@ bool GPS::getShutdownFlag()
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	if (PMSMPtr->Shutdown.Status == 0xFF || PMSMPtr->Shutdown.Status == 0x10)
 		return 1;
-	if ((timePtr->Laser - timePtr->PM) > (PMSMPtr->LifeCounter)) {
+	if ((timePtr->GPS - timePtr->PM) > (PMSMPtr->LifeCounter)) {
 		Console::WriteLine("PM died");
 		return 1;
 	}
