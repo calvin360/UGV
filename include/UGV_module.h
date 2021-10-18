@@ -63,6 +63,7 @@ ref class UGV_module
 
 	protected:
 		int Error;							// Stores last error code
+		//Laser
 		TcpClient^ Client;					// Handle for TCP connection
 		NetworkStream^ Stream;				// Handle for TCP data stream
 		array<unsigned char>^ SendData;
@@ -71,10 +72,21 @@ ref class UGV_module
 		array<String^>^ StringArray;
 		double StartAngle;
 		double Res;
+		//GPS
+		TcpClient^ Client1;					// Handle for TCP connection
+		NetworkStream^ Stream1;
+		array<unsigned char>^ SendData1;
+		array<unsigned char>^ ReadData1;
+		String^ ResponseData1;
+		int Start;
+		unsigned int Header;
+		unsigned int Data;
+		unsigned char* BytePtr;
 
 		SMObject* tObj;					// Filled in setupSharedMemory(). For accessing PM shared Memory
 		SMObject* PMObj;				// Filled in setupSharedMemory(). For storing sensory data to shared Memory
 		SMObject* LsObj;
+		SMObject* GPSObj;
 };
 
 #endif 

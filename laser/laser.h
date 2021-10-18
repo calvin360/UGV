@@ -3,9 +3,6 @@
 #include <smstructs.h>
 #include <SMObject.h>
 
-//unsigned long CRC32Value(int i);
-//unsigned long CalculateBlockCRC32(unsigned long ulCount, unsigned char* ucBuffer);
-
 ref class Laser : public UGV_module
 {
 

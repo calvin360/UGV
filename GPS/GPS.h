@@ -14,11 +14,11 @@ ref class GPS : public UGV_module
 public:
 	int connect(String^ hostName, int portNumber) override;
 	int setupSharedMemory() override;
-	int getData(array<unsigned char>^ SendData, String^ ResponseData) override;
+	int getData() override;
 	int checkData() override;
-	int sendDataToSharedMemory(int NumRanges, array<String^>^ StringArray, SM_Laser* LsPtr, double Res) override;
+	int sendDataToSharedMemory() override;
 	bool getShutdownFlag() override;
-	int setHeartbeat(bool heartbeat) override;
+	int setHeartbeat() override;
 	~GPS();
 
 protected:

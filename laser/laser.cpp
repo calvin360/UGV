@@ -19,6 +19,7 @@ int Laser::connect(String^ hostName, int portNumber)
 	SendData = gcnew array<unsigned char>(16);
 	ReadData = gcnew array<unsigned char>(2500);
 	NetworkStream^ Stream = Client->GetStream();
+	//authentication
 	SendData = System::Text::Encoding::ASCII->GetBytes(Str);
 	Stream->Write(SendData, 0, SendData->Length);
 	System::Threading::Thread::Sleep(10);
@@ -72,7 +73,7 @@ int Laser::getData()
 }
 int Laser::checkData()
 {
-	if (StringArray[1] == "LMDscandata") {
+	if (StringArray[0] == "sRN" && StringArray[1] == "LMDscandata") {
 		Console::WriteLine("Good data");
 		Console::WriteLine(StringArray[1]);
 

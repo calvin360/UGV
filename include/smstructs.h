@@ -43,9 +43,13 @@ struct SM_VehicleControl
 
 struct SM_GPS
 {
+	unsigned int Header;
+	unsigned char Discards1[40];
 	double northing;
 	double easting;
 	double height;
+	unsigned char Discards2[40];
+	unsigned int Checksum;
 };
 
 struct UnitFlags
