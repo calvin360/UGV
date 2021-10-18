@@ -104,28 +104,24 @@ int GPS::checkData()
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	// Check CRC is correct
 	unsigned long CRC = (unsigned long)GPSPtr->checkSum;
-	unsigned long calcCRC = CalculateBlockCRC32(sizeof(SM_GPS) - 4, (unsigned char*)GPSDataPtr);
+	unsigned long calcCRC = CalculateBlockCRC32(sizeof(SM_GPS) - 4, (unsigned char*)GPSPtr);
 
 	if (CRC == calcCRC) {
 		// Print GPS data
-		Console::Write("northing: {0,8:N3}\t", GPSDataPtr->northing);
-		Console::Write("easting: {0,9:N3}\t", GPSDataPtr->easting);
-		Console::Write("height: {0,10:N3}\t", GPSDataPtr->height);
+		Console::Write("northing: {0,8:N3}\t", GPSPtr->northing);
+		Console::Write("easting: {0,9:N3}\t", GPSPtr->easting);
+		Console::Write("height: {0,10:N3}\t", GPSPtr->height);
 		Console::Write("checksum: {0,8}\t", CRC);
 		Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
 	return 1;
 }
 int GPS::sendDataToSharedMemory()
 {
-	//array<double>^ Range = gcnew array<double>(NumRanges);
-	//array<double>^ RangeX = gcnew array<double>(NumRanges);
-	//array<double>^ RangeY = gcnew array<double>(NumRanges);
-
-	//for (int i = 0; i < NumRanges; i++) {
-	//	Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
-	//	LsPtr->x[i] = Range[i] * sin(i * Res);
-	//	LsPtr->y[i] = Range[i] * sin(i * Res);
-	//}
+	int n = GPSSMObjPtr->numData;
+	GPSSMObjPtr->northing[n] = GPSDataPtr->northing;
+	GPSSMObjPtr->easting[n] = GPSDataPtr->easting;
+	GPSSMObjPtr->height[n] = GPSDataPtr->height;
+	GPSSMObjPtr->numData++;
 	return 1;
 }
 bool GPS::getShutdownFlag()

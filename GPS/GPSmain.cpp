@@ -50,7 +50,8 @@ int main(void) {
 		//	Console::WriteLine("PM died");
 		//	break;
 		//}
-
+		myGPS.getShutdownFlag();
+		myGPS.setHeartbeat();
 	}
 	Console::WriteLine("GPS process ended");
 	Sleep(1000);
