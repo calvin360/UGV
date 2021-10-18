@@ -38,6 +38,7 @@ int main(void) {
 	myGPS.connect("192.168.1.200", 24000);
 
 	while (!_kbhit()) {
+		myGPS.setHeartbeat();
 		if (myGPS.getShutdownFlag() == 1)
 			break;
 		myGPS.getData();

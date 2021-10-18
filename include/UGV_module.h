@@ -73,8 +73,8 @@ ref class UGV_module
 		double StartAngle;
 		double Res;
 		//GPS
-		TcpClient^ Client1;					// Handle for TCP connection
-		NetworkStream^ Stream1;
+		TcpClient^ GPSClient;					// Handle for TCP connection
+		NetworkStream^ GPSStream;
 		array<unsigned char>^ SendData1;
 		array<unsigned char>^ ReadData1;
 		String^ ResponseData1;

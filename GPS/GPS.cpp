@@ -10,15 +10,14 @@ using namespace System::IO::Ports;
 int GPS::connect(String^ hostName, int portNumber)
 {
 	// Pointer to TcpClent type object on managed heap
-	Client1 = gcnew TcpClient(hostName, portNumber);
-	Client1->NoDelay = true;
-	Client1->ReceiveTimeout = 500;//ms
-	Client1->SendTimeout = 500;//ms
-	Client1->ReceiveBufferSize = 1024;
-	Client1->SendBufferSize = 1024;
+	GPSClient = gcnew TcpClient(hostName, portNumber);
+	GPSClient->NoDelay = true;
+	GPSClient->ReceiveTimeout = 500;//ms
+	GPSClient->SendTimeout = 500;//ms
+	GPSClient->ReceiveBufferSize = 1024;
+	GPSClient->SendBufferSize = 1024;
 	// arrays of unsigned chars to send and receive data
-	array<unsigned char>^ SendData1;
-	array<unsigned char>^ ReadData1;
+	ReadData1 = gcnew array<unsigned char>(sizeof(SM_GPS));
 	String^ ResponseData1;
 
 
@@ -86,12 +85,14 @@ int GPS::getData()
 	//double StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	//double Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
 	//int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
-	NetworkStream^ Stream1 = Client1->GetStream();
-	Stream1->Read(ReadData1, 0, ReadData1->Length);
+	NetworkStream^ GPSStream = GPSClient->GetStream();
+	GPSStream->Read(ReadData1, 0, ReadData1->Length);
+	Console::WriteLine(ReadData1);
+	Sleep(9000);
 	Header = 0;
 	int i = 0;
 	do {
-		Data = ResponseData1[i++];
+		Data = ReadData1[i++];
 		Header = ((Header << 8) | Data);
 
 	} while (Header != 0xaa44121c);
