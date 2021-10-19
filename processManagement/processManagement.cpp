@@ -16,7 +16,7 @@ using namespace System::Net::Sockets;
 using namespace System::Net;
 using namespace System::Text;
 
-#define NUM_UNITS 5
+#define NUM_UNITS 3
 
 bool IsProcessRunning(const char* processName);
 void StartProcesses();
@@ -25,10 +25,10 @@ void print(ProcessManagement* PMSMPtr);
 //defining start up sequence
 TCHAR Units[10][20] = //
 {
-TEXT("Camera.exe"),
-TEXT("VehicleControl.exe"),
-TEXT("LASER.exe"),
 TEXT("Display.exe"),
+TEXT("Camera.exe"),
+TEXT("LASER.exe"),
+TEXT("VehicleControl.exe"),
 TEXT("GPS.exe")
 };
 
@@ -50,7 +50,7 @@ int main()
 	//start all 5 modules
 	StartProcesses();
 	Sleep(10);
-	PMSMPtr->LifeCounter = 1;
+	//PMSMPtr->LifeCounter = 1;
 	while (!_kbhit()) {
 		timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine("PM time stamp    : {0,12:F3} {1,12:X8}", timePtr->PM, PMSMPtr->Shutdown.Status);
