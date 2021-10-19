@@ -36,7 +36,6 @@ int main(void) {
 	GPS myGPS;
 	myGPS.setupSharedMemory();
 	myGPS.connect("192.168.1.200", 24000);
-	Sleep(900);
 	while (!_kbhit()) {
 		myGPS.setHeartbeat();
 		if (myGPS.getShutdownFlag() == 1)

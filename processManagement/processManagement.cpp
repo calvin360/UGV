@@ -107,7 +107,7 @@ int main()
 			break;
 	}
 	Console::WriteLine("Process management terminated normally.");
-	Sleep(1000);
+	Sleep(10000);
 	return 0;
 }
 

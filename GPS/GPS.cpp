@@ -100,26 +100,27 @@ int GPS::getData()
 	Header = 0;
 	int i = 0;
 
-	while (!GPSStream->DataAvailable) {
-		// Do nothing
-	}
-	do {
-		Data = ReadData1[i++];
-		Header = ((Header << 8) | Data);
+	if (GPSStream->DataAvailable) {
+		do {
+			Data = ReadData1[i++];
+			Header = ((Header << 8) | Data);
 
-	} while (Header != 0xaa44121c);
-		Start = i - 4;
-	//store data
-	GPSStruct GPS;
-	unsigned char* BytePtr = nullptr;
-	if (Header == 0xaa44121c) {
-		BytePtr = (unsigned char*)&GPS;
-		for (int i = Start; i < (Start + sizeof(SM_GPS)); i++) {
-			*(BytePtr++) = ReadData1[i];
+		} while (Header != 0xaa44121c);
+			Start = i - 4;
+		//store data
+		GPSStruct GPS;
+		unsigned char* BytePtr = nullptr;
+		if (Header == 0xaa44121c) {
+			BytePtr = (unsigned char*)&GPS;
+			for (int i = Start; i < (Start + sizeof(SM_GPS)); i++) {
+				*(BytePtr++) = ReadData1[i];
+			}
 		}
+		//Console::WriteLine(ReadData1);
+		Console::WriteLine("northing: {0:F3}", GPS.northing);
+		Console::WriteLine("easting: {0:F3}", GPS.easting);
+		Console::WriteLine("height: {0:F3}", GPS.height);
 	}
-	//Console::WriteLine(ReadData1);
-	Console::WriteLine("easting: {0:F3}", GPS.easting);
 
 	return 1;
 }
