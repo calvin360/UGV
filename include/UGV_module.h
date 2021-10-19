@@ -80,7 +80,6 @@ ref class UGV_module
 		int Start;
 		unsigned int Header;
 		unsigned int Data;
-		unsigned char* BytePtr;
 
 		SMObject* tObj;					// Filled in setupSharedMemory(). For accessing PM shared Memory
 		SMObject* PMObj;				// Filled in setupSharedMemory(). For storing sensory data to shared Memory

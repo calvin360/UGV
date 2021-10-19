@@ -5,7 +5,17 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 using namespace System::IO::Ports;
 
-//SM_GPSData NovatelGPS;
+struct GPSStruct
+{
+	unsigned int Header;
+	unsigned char Discards1[40];
+	double northing;
+	double easting;
+	double height;
+	unsigned char Discards2[40];
+	unsigned int checkSum;
+
+};
 
 int GPS::connect(String^ hostName, int portNumber)
 {
@@ -89,22 +99,27 @@ int GPS::getData()
 	//trap header
 	Header = 0;
 	int i = 0;
+
+	while (!GPSStream->DataAvailable) {
+		// Do nothing
+	}
 	do {
 		Data = ReadData1[i++];
 		Header = ((Header << 8) | Data);
 
 	} while (Header != 0xaa44121c);
-	Start = i - 4;
+		Start = i - 4;
 	//store data
+	GPSStruct GPS;
+	unsigned char* BytePtr = nullptr;
 	if (Header == 0xaa44121c) {
-		BytePtr = (unsigned char*)GPSPtr;
+		BytePtr = (unsigned char*)&GPS;
 		for (int i = Start; i < (Start + sizeof(SM_GPS)); i++) {
 			*(BytePtr++) = ReadData1[i];
-			Console::WriteLine("11111111");
 		}
 	}
-	Console::WriteLine(ReadData1);
-	Console::WriteLine("easting: {0:F3}", GPSPtr->easting);
+	//Console::WriteLine(ReadData1);
+	Console::WriteLine("easting: {0:F3}", GPS.easting);
 
 	return 1;
 }
