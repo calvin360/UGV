@@ -86,8 +86,7 @@ int GPS::getData()
 	//int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
 	NetworkStream^ GPSStream = GPSClient->GetStream();
 	GPSStream->Read(ReadData1, 0, ReadData1->Length);
-	Console::WriteLine(ReadData1);
-	Sleep(9000);
+	//trap header
 	Header = 0;
 	int i = 0;
 	do {
@@ -96,13 +95,15 @@ int GPS::getData()
 
 	} while (Header != 0xaa44121c);
 	Start = i - 4;
-
+	//store data
 	if (Header == 0xaa44121c) {
 		BytePtr = (unsigned char*)GPSPtr;
 		for (int i = Start; i < (Start + sizeof(SM_GPS)); i++) {
 			*(BytePtr++) = ReadData1[i];
+			Console::WriteLine("11111111");
 		}
 	}
+	Console::WriteLine(ReadData1);
 	Console::WriteLine("easting: {0:F3}", GPSPtr->easting);
 
 	return 1;
