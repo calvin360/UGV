@@ -55,9 +55,9 @@ struct SM_GPS
 //put headings here
 struct SM_GPSData
 {
-	double northing[1000];
-	double easting[1000];
-	double height[1000];
+	double northing;
+	double easting;
+	double height;
 	int numData;
 };
 

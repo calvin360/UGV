@@ -24,7 +24,7 @@ int GPS::connect(String^ hostName, int portNumber)
 	GPSClient->NoDelay = true;
 	GPSClient->ReceiveTimeout = 500;//ms
 	GPSClient->SendTimeout = 500;//ms
-	GPSClient->ReceiveBufferSize = 1024;
+	GPSClient->ReceiveBufferSize = 224;
 	GPSClient->SendBufferSize = 1024;
 	// arrays of unsigned chars to send and receive data
 	ReadData1 = gcnew array<unsigned char>(sizeof(SM_GPS));
@@ -78,6 +78,7 @@ int GPS::setupSharedMemory()
 int GPS::getData()
 {
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
+	NetworkStream^ GPSStream = GPSClient->GetStream();
 	//// Write command asking for data
 	//Stream->WriteByte(0x02);
 	//Stream->Write(SendData, 0, SendData->Length);
@@ -94,32 +95,31 @@ int GPS::getData()
 	//double StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	//double Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
 	//int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
-	NetworkStream^ GPSStream = GPSClient->GetStream();
-	GPSStream->Read(ReadData1, 0, ReadData1->Length);
 	//trap header
 	Header = 0;
 	int i = 0;
 
 	if (GPSStream->DataAvailable) {
+		GPSStream->Read(ReadData1, 0, ReadData1->Length);
 		do {
 			Data = ReadData1[i++];
 			Header = ((Header << 8) | Data);
 
 		} while (Header != 0xaa44121c);
-			Start = i - 4;
+		Start = i - 4;
 		//store data
 		GPSStruct GPS;
 		unsigned char* BytePtr = nullptr;
 		if (Header == 0xaa44121c) {
 			BytePtr = (unsigned char*)&GPS;
-			for (int i = Start; i < (Start + sizeof(SM_GPS)); i++) {
+			for (int i = Start; i < Start + sizeof(SM_GPSData); i++) {
 				*(BytePtr++) = ReadData1[i];
 			}
 		}
 		//Console::WriteLine(ReadData1);
-		Console::WriteLine("northing: {0:F3}", GPS.northing);
-		Console::WriteLine("easting: {0:F3}", GPS.easting);
-		Console::WriteLine("height: {0:F3}", GPS.height);
+		Console::WriteLine("northing: {0:F12}", GPS.northing);
+		Console::WriteLine("easting: {0:F12}", GPS.easting);
+		Console::WriteLine("height: {0:F12}", GPS.height);
 	}
 
 	return 1;
@@ -169,7 +169,7 @@ int GPS::setHeartbeat()
 		PMSMPtr->Heartbeat.Flags.GPS = 1;
 	timePtr->GPS = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	Console::WriteLine(timePtr->GPS);
-	Sleep(50);
+	Sleep(100);
 	return 1;
 }
 GPS::~GPS()
