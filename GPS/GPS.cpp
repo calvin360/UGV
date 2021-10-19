@@ -18,7 +18,6 @@ int GPS::connect(String^ hostName, int portNumber)
 	GPSClient->SendBufferSize = 1024;
 	// arrays of unsigned chars to send and receive data
 	ReadData1 = gcnew array<unsigned char>(sizeof(SM_GPS));
-	String^ ResponseData1;
 
 
 	//SerialPort^ Port = nullptr;
@@ -101,7 +100,7 @@ int GPS::getData()
 	if (Header == 0xaa44121c) {
 		BytePtr = (unsigned char*)GPSPtr;
 		for (int i = Start; i < (Start + sizeof(SM_GPS)); i++) {
-			*(BytePtr++) = ResponseData1[i];
+			*(BytePtr++) = ReadData1[i];
 		}
 	}
 	Console::WriteLine("easting: {0:F3}", GPSPtr->easting);

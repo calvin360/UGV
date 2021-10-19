@@ -77,7 +77,6 @@ ref class UGV_module
 		NetworkStream^ GPSStream;
 		array<unsigned char>^ SendData1;
 		array<unsigned char>^ ReadData1;
-		String^ ResponseData1;
 		int Start;
 		unsigned int Header;
 		unsigned int Data;
