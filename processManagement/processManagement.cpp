@@ -26,10 +26,10 @@ void print(ProcessManagement* PMSMPtr);
 TCHAR Units[10][20] = //
 {
 TEXT("Camera.exe"),
-TEXT("LASER2.exe"),
 TEXT("VehicleControl.exe"),
-TEXT("GPS1.exe"),
-TEXT("Display2.exe")
+TEXT("GPS2.exe"),
+TEXT("Display2.exe"),
+TEXT("LASER2.exe")
 };
 
 int main()
