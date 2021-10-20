@@ -17,7 +17,7 @@ struct GPSStruct
 	unsigned int checkSum;
 
 };
-
+GPSStruct NovatelGPS;
 int GPS::connect(String^ hostName, int portNumber)
 {
 	// Pointer to TcpClent type object on managed heap
@@ -78,22 +78,6 @@ int GPS::setupSharedMemory()
 }
 int GPS::getData()
 {
-	//// Write command asking for data
-	//Stream->WriteByte(0x02);
-	//Stream->Write(SendData, 0, SendData->Length);
-	//Stream->WriteByte(0x03);
-	//// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
-	//System::Threading::Thread::Sleep(10);
-	//// Read the incoming data
-	//Stream->Read(ReadData, 0, ReadData->Length);
-	//// Convert incoming data from an array of unsigned char bytes to an ASCII string
-	//ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
-	//// Print the received string on the screen
-	////Console::WriteLine(ResponseData);
-	//array<String^>^ StringArray = ResponseData->Split(' ');
-	//double StartAngle = System::Convert::ToInt32(StringArray[23], 16);
-	//double Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
-	//int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
 	//trap header
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	NetworkStream^ GPSStream = GPSClient->GetStream();
@@ -112,19 +96,18 @@ int GPS::getData()
 		} while (Header != 0xaa44121c);
 		Start = i - 4;
 		//store data
-		GPSStruct GPS;
 		Console::WriteLine(ReadData1);
 		unsigned char* BytePtr = nullptr;
 		if (Header == 0xaa44121c) {
-			BytePtr = (unsigned char*)&GPS;
+			BytePtr = (unsigned char*)&NovatelGPS;
 			for (int i = Start; i < Start + sizeof(GPSStruct); i++) {
 				*(BytePtr++) = ReadData1[i];
 			}
 		}
 		//Console::WriteLine(ReadData1);
-		Console::WriteLine("northing: {0:F12}", GPS.northing);
-		Console::WriteLine("easting: {0:F12}", GPS.easting);
-		Console::WriteLine("height: {0:F12}", GPS.height);
+		Console::WriteLine("northing: {0:F12}", NovatelGPS.northing);
+		Console::WriteLine("easting: {0:F12}", NovatelGPS.easting);
+		Console::WriteLine("height: {0:F12}", NovatelGPS.height);
 	}
 
 	return 1;
@@ -134,15 +117,15 @@ int GPS::checkData()
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	// Check CRC is correct
 	unsigned long CRC = (unsigned long)GPSPtr->checkSum;
-	//unsigned long calcCRC = CalculateBlockCRC32(sizeof(SM_GPS) - 4, (unsigned char*)GPSPtr);
+//unsigned long calcCRC = CalculateBlockCRC32(sizeof(SM_GPS) - 4, (unsigned char*)GPSPtr);
 
-	//if (CRC == calcCRC) {
-	//	// Print GPS data
-	//	Console::Write("northing: {0,8:N3}\t", GPSPtr->northing);
-	//	Console::Write("easting: {0,9:N3}\t", GPSPtr->easting);
-	//	Console::Write("height: {0,10:N3}\t", GPSPtr->height);
-	//	Console::Write("checksum: {0,8}\t", CRC);
-	//	Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
+//if (CRC == calcCRC) {
+//	// Print GPS data
+//	Console::Write("northing: {0,8:N3}\t", GPSPtr->northing);
+//	Console::Write("easting: {0,9:N3}\t", GPSPtr->easting);
+//	Console::Write("height: {0,10:N3}\t", GPSPtr->height);
+//	Console::Write("checksum: {0,8}\t", CRC);
+//	Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
 	return 1;
 }
 int GPS::sendDataToSharedMemory()
