@@ -82,7 +82,10 @@ double steering = 0;
 //making SM global
 timeStamps* time1;
 ProcessManagement* PM;
-SM_Laser* Ls;
+//SM_Laser* Ls;
+	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));
+	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+	SMObject* LsObj;
 
 //int _tmain(int argc, _TCHAR* argv[]) {
 int main(int argc, char ** argv) {
@@ -90,24 +93,22 @@ int main(int argc, char ** argv) {
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
-SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));
-SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
-timeStamps* timePtr = nullptr;
-ProcessManagement* PMSMPtr = nullptr;
-SM_Laser* LsPtr = nullptr;
-	tObj.SMCreate();
+	//LsObj = new SMObject(_TEXT("SM_Laser"), sizeof(SM_Laser));
+	timeStamps* timePtr = nullptr;
+	ProcessManagement* PMSMPtr = nullptr;
+	//SM_Laser* LsPtr = nullptr;
+	//tObj.SMCreate();
 	tObj.SMAccess();
 	timePtr = (timeStamps*)tObj.pData;
 	time1 = timePtr;
-	PMObj.SMCreate();
+	//PMObj.SMCreate();
 	PMObj.SMAccess();
 	PMSMPtr = (ProcessManagement*)PMObj.pData;
 	PM = PMSMPtr;
-	LsObj.SMCreate();
-	LsObj.SMAccess();
-	LsPtr = (SM_Laser*)LsObj.pData;
-	Ls = LsPtr;
+	//LsObj->SMCreate();
+	//LsObj->SMAccess();
+	//Ls = (SM_Laser*)LsObj->pData;
+	//Ls = LsPtr;
 
 	glutInit(&argc, (char**)(argv));
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
@@ -360,6 +361,9 @@ void motion(int x, int y) {
 };
 
 void drawLaser() {
+	SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
+	while(LsObj.SMAccess());
+	SM_Laser* Ls = (SM_Laser*)LsObj.pData;
 	glPushMatrix();
 	vehicle->positionInGL();
 	glTranslated(0.5, 0, 0); // move reference frame to lidar
@@ -368,7 +372,7 @@ void drawLaser() {
 	glBegin(GL_LINES);
 	for (int i = 0; i < Ls->num; i++) {
 		addLine(Ls->x[i] / 1000.0, Ls->y[i] / 1000.0);
-		//Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, Ls->x[i], Ls->y[i]);
+		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, Ls->x[i], Ls->y[i]);
 	}
 	glEnd();
 	glPopMatrix();

@@ -5,6 +5,7 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 using namespace System::IO::Ports;
 
+#pragma pack(1)
 struct GPSStruct
 {
 	unsigned int Header;
@@ -24,10 +25,10 @@ int GPS::connect(String^ hostName, int portNumber)
 	GPSClient->NoDelay = true;
 	GPSClient->ReceiveTimeout = 500;//ms
 	GPSClient->SendTimeout = 500;//ms
-	GPSClient->ReceiveBufferSize = 224;
+	GPSClient->ReceiveBufferSize = 1024;
 	GPSClient->SendBufferSize = 1024;
 	// arrays of unsigned chars to send and receive data
-	ReadData1 = gcnew array<unsigned char>(sizeof(SM_GPS));
+
 
 
 	//SerialPort^ Port = nullptr;
@@ -77,8 +78,6 @@ int GPS::setupSharedMemory()
 }
 int GPS::getData()
 {
-	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
-	NetworkStream^ GPSStream = GPSClient->GetStream();
 	//// Write command asking for data
 	//Stream->WriteByte(0x02);
 	//Stream->Write(SendData, 0, SendData->Length);
@@ -96,8 +95,13 @@ int GPS::getData()
 	//double Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
 	//int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
 	//trap header
-	Header = 0;
+	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
+	NetworkStream^ GPSStream = GPSClient->GetStream();
+	ReadData1 = gcnew array<unsigned char>(sizeof(GPSStruct) * 2);
+	unsigned int Header = 0;
 	int i = 0;
+	int Start = 0;
+	unsigned char Data;
 
 	if (GPSStream->DataAvailable) {
 		GPSStream->Read(ReadData1, 0, ReadData1->Length);
@@ -109,10 +113,11 @@ int GPS::getData()
 		Start = i - 4;
 		//store data
 		GPSStruct GPS;
+		Console::WriteLine(ReadData1);
 		unsigned char* BytePtr = nullptr;
 		if (Header == 0xaa44121c) {
 			BytePtr = (unsigned char*)&GPS;
-			for (int i = Start; i < Start + sizeof(SM_GPSData); i++) {
+			for (int i = Start; i < Start + sizeof(GPSStruct); i++) {
 				*(BytePtr++) = ReadData1[i];
 			}
 		}

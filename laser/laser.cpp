@@ -36,16 +36,16 @@ int Laser::setupSharedMemory()
 {
 	//SM for timestamps
 	tObj = new SMObject (_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
-	tObj->SMCreate();
+	//tObj->SMCreate();
 	tObj->SMAccess();
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	//SM for PM
 	PMObj = new SMObject (_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-	PMObj->SMCreate();
+	//PMObj->SMCreate();
 	PMObj->SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	LsObj = new SMObject (_TEXT("SM_Laser"), sizeof(SM_Laser));
-	LsObj->SMCreate();
+	//LsObj->SMCreate();
 	LsObj->SMAccess();
 	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
 	return 1;
@@ -73,7 +73,8 @@ int Laser::getData()
 }
 int Laser::checkData()
 {
-	if (StringArray[1] == "LMDscandata") {
+	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
+	if (StringArray[1] == "LMDscandata"&&LsPtr->num==361) {
 		Console::WriteLine("Good data");
 		Console::WriteLine(StringArray[1]);
 

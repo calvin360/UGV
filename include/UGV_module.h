@@ -77,9 +77,9 @@ ref class UGV_module
 		NetworkStream^ GPSStream;
 		array<unsigned char>^ SendData1;
 		array<unsigned char>^ ReadData1;
-		int Start;
-		unsigned int Header;
-		unsigned int Data;
+		//int Start;
+		//unsigned int Header;
+		//unsigned int Data;
 
 		SMObject* tObj;					// Filled in setupSharedMemory(). For accessing PM shared Memory
 		SMObject* PMObj;				// Filled in setupSharedMemory(). For storing sensory data to shared Memory

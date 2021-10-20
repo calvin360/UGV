@@ -25,11 +25,11 @@ void print(ProcessManagement* PMSMPtr);
 //defining start up sequence
 TCHAR Units[10][20] = //
 {
-TEXT("Display.exe"),
 TEXT("Camera.exe"),
-TEXT("LASER.exe"),
+TEXT("LASER2.exe"),
 TEXT("VehicleControl.exe"),
-TEXT("GPS.exe")
+TEXT("GPS1.exe"),
+TEXT("Display2.exe")
 };
 
 int main()
@@ -43,6 +43,9 @@ int main()
 	PMObj.SMCreate();
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
+	SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
+	LsObj.SMCreate();
+	LsObj.SMAccess();
 	PMSMPtr->Heartbeat.Status = 0x07; //set low by default 
 	//wait time for unresponsive processes (seconds)
 	PMSMPtr->LifeCounter = 3;
