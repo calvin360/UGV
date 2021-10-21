@@ -21,5 +21,7 @@ public:
 
 protected:
 	// YOUR CODE HERE (ADDITIONAL MEMBER VARIABLES THAT YOU MAY WANT TO ADD)
-
+	//double steering;
+	//double speed;
+	bool flag;
 };

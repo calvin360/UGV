@@ -288,8 +288,6 @@ void idle() {
 	if (KeyManager::get()->isSpecialKeyPressed(GLUT_KEY_DOWN)) {
 		speed = Vehicle::MAX_BACKWARD_SPEED_MPS;
 	}
-	VC->Speed = speed;
-	VC->Steering = steering;
 
 
 
@@ -303,6 +301,8 @@ void idle() {
 	// do a simulation step
 	if (vehicle != NULL) {
 		vehicle->update(speed, steering, elapsedTime);
+		VC->Speed = speed;
+		VC->Steering = steering;
 	}
 	display();
 	//Sleep(9000);

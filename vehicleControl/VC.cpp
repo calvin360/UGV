@@ -16,12 +16,13 @@ int VC::connect(String^ hostName, int portNumber)
 	Client->ReceiveBufferSize = 1024;
 	Client->SendBufferSize = 1024;
 	String^ Str = gcnew String("5260528\n");
-	SendData = gcnew array<unsigned char>(16);
+	SendData2 = gcnew array<unsigned char>(16);
 	//ReadData = gcnew array<unsigned char>(2500);
 	NetworkStream^ Stream = Client->GetStream();
-	SendData = System::Text::Encoding::ASCII->GetBytes(Str);
+	SendData2 = System::Text::Encoding::ASCII->GetBytes(Str);
 	Stream->Write(SendData, 0, SendData->Length);
-	System::Threading::Thread::Sleep(10);
+	flag = 0;
+	//System::Threading::Thread::Sleep(10);
 	//SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
 	// Read the incoming data
 	//Stream->Read(ReadData, 0, ReadData->Length);
@@ -35,16 +36,13 @@ int VC::setupSharedMemory()
 {
 	//SM for timestamps
 	tObj = new SMObject(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
-	//tObj->SMCreate();
 	tObj->SMAccess();
 	//timeStamps* timePtr = (timeStamps*)tObj->pData;
 	//SM for PM
 	PMObj = new SMObject(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-	//PMObj->SMCreate();
 	PMObj->SMAccess();
 	//ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	VCObj = new SMObject(_TEXT("SM_VehicleControl"), sizeof(SM_VehicleControl));
-	//LsObj->SMCreate();
 	VCObj->SMAccess();
 	return 1;
 }
@@ -53,26 +51,34 @@ int VC::getData()
 	SM_VehicleControl* VCPtr = (SM_VehicleControl*)LsObj->pData;
 	// Write command asking for data
 	NetworkStream^ Stream = Client->GetStream();
-	Stream->WriteByte(0x02);
-	Stream->Write(SendData, 0, SendData->Length);
-	Stream->WriteByte(0x03);
-	// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
-	System::Threading::Thread::Sleep(10);
-	// Read the incoming data
-	Stream->Read(ReadData, 0, ReadData->Length);
-	// Convert incoming data from an array of unsigned char bytes to an ASCII string
-	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
-	// Print the received string on the screen
-	StringArray = ResponseData->Split(' ');
-	StartAngle = System::Convert::ToInt32(StringArray[23], 16);
-	Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
-	//VCPtr->num = System::Convert::ToInt32(StringArray[25], 16);
+	//Stream->WriteByte(0x02);
+	//Stream->Write(SendData, 0, SendData->Length);
+	//Stream->WriteByte(0x03);
+	//// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
+	//System::Threading::Thread::Sleep(10);
+	//// Read the incoming data
+	//Stream->Read(ReadData, 0, ReadData->Length);
+	//// Convert incoming data from an array of unsigned char bytes to an ASCII string
+	//ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
+	//// Print the received string on the screen
+	//StringArray = ResponseData->Split(' ');
+	//StartAngle = System::Convert::ToInt32(StringArray[23], 16);
+	//Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
+	////VCPtr->num = System::Convert::ToInt32(StringArray[25], 16);
+
+	String^ Control = gcnew String("#" + VCPtr->Steering.ToString("f2") + " " + VCPtr->Speed.ToString("f2") + flag + "#");
+	Console::WriteLine(Control);
+	SendData2= System::Text::Encoding::ASCII->GetBytes(Control);
+	Stream->Write(SendData2, 0, SendData2->Length);
 	return 1;
 }
 int VC::checkData()
 {
-	if (StringArray[1] == "LMDscandata") {
+	SM_VehicleControl* VCPtr = (SM_VehicleControl*)LsObj->pData;
+	if (-1<=VCPtr->Speed<1&&-40<=VCPtr->Steering<=40) {
 		Console::WriteLine("Good data");
+		flag = !flag;
+		Sleep(100);
 		return 1;
 	}
 	else {
