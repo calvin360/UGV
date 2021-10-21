@@ -40,8 +40,19 @@ struct SM_VehicleControl
 	double Speed;
 	double Steering;
 };
-
+#pragma pack(1)
 struct SM_GPS
+{
+	unsigned int Header;
+	unsigned char Discards1[40];
+	double northing;
+	double easting;
+	double height;
+	unsigned char Discards2[40];
+	unsigned int checkSum;
+};
+
+struct SM_GPSData
 {
 	double northing;
 	double easting;

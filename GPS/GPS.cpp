@@ -5,19 +5,19 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 using namespace System::IO::Ports;
 
-#pragma pack(1)
-struct GPSStruct
-{
-	unsigned int Header;
-	unsigned char Discards1[40];
-	double northing;
-	double easting;
-	double height;
-	unsigned char Discards2[40];
-	unsigned int checkSum;
-
-};
-GPSStruct NovatelGPS;
+//#pragma pack(1)
+//struct GPSStruct
+//{
+//	unsigned int Header;
+//	unsigned char Discards1[40];
+//	double northing;
+//	double easting;
+//	double height;
+//	unsigned char Discards2[40];
+//	unsigned int checkSum;
+//
+//};
+//GPSStruct NovatelGPS;
 int GPS::connect(String^ hostName, int portNumber)
 {
 	// Pointer to TcpClent type object on managed heap
@@ -27,9 +27,6 @@ int GPS::connect(String^ hostName, int portNumber)
 	GPSClient->SendTimeout = 500;//ms
 	GPSClient->ReceiveBufferSize = 1024;
 	GPSClient->SendBufferSize = 1024;
-	// arrays of unsigned chars to send and receive data
-
-
 
 	//SerialPort^ Port = nullptr;
 	//String^ PortName = nullptr;
@@ -69,6 +66,11 @@ int GPS::setupSharedMemory()
 	GPSObj->SMCreate();
 	GPSObj->SMAccess();
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
+	//SM for GPS data
+	GPSDataObj = new SMObject(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
+	GPSDataObj->SMCreate();
+	GPSDataObj->SMAccess();
+	SM_GPS* GPSDataPtr = (SM_GPS*)GPSDataObj->pData;
 	return 1;
 }
 int GPS::getData()
@@ -76,7 +78,7 @@ int GPS::getData()
 	//trap header
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	NetworkStream^ GPSStream = GPSClient->GetStream();
-	ReadData1 = gcnew array<unsigned char>(sizeof(GPSStruct) * 2);
+	ReadData1 = gcnew array<unsigned char>(sizeof(SM_GPS) * 2);
 	unsigned int Header = 0;
 	int i = 0;
 	int Start = 0;
@@ -94,15 +96,15 @@ int GPS::getData()
 		Console::WriteLine(ReadData1);
 		unsigned char* BytePtr = nullptr;
 		if (Header == 0xaa44121c) {
-			BytePtr = (unsigned char*)&NovatelGPS;
-			for (int i = Start; i < Start + sizeof(GPSStruct); i++) {
+			BytePtr = (unsigned char*)&GPSPtr;
+			for (int i = Start; i < Start + sizeof(SM_GPS); i++) {
 				*(BytePtr++) = ReadData1[i];
 			}
 		}
 		//Console::WriteLine(ReadData1);
-		Console::WriteLine("northing: {0:F12}", NovatelGPS.northing);
-		Console::WriteLine("easting: {0:F12}", NovatelGPS.easting);
-		Console::WriteLine("height: {0:F12}", NovatelGPS.height);
+		//Console::WriteLine("northing: {0:F12}", NovatelGPS.northing);
+		//Console::WriteLine("easting: {0:F12}", NovatelGPS.easting);
+		//Console::WriteLine("height: {0:F12}", NovatelGPS.height);
 	}
 
 	return 1;
@@ -111,25 +113,29 @@ int GPS::checkData()
 {
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	// Check CRC is correct
-	unsigned long CRC = (unsigned long)NovatelGPS.checkSum;
+	unsigned long CRC = (unsigned long)GPSPtr->checkSum;
 	unsigned long calcCRC = CalculateBlockCRC32(sizeof(SM_GPS) - 4, (unsigned char*)GPSPtr);
-
+	Console::Write(" {0,8:F9}, {1,8:F9}", CRC,calcCRC);
 	if (CRC == calcCRC) {
 		// Print GPS data
-		Console::Write("northing: {0,8:N3}\t", GPSPtr->northing);
-		Console::Write("easting: {0,9:N3}\t", GPSPtr->easting);
-		Console::Write("height: {0,10:N3}\t", GPSPtr->height);
-		Console::Write("checksum: {0,8}\t", CRC);
-		Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
+		//Console::Write("northing: {0,8:N3}\t", GPSPtr->northing);
+		//Console::Write("easting: {0,9:N3}\t", GPSPtr->easting);
+		//Console::Write("height: {0,10:N3}\t", GPSPtr->height);
+		//Console::Write("checksum: {0,8}\t", CRC);
+		//Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
+		Console::WriteLine("northing: {0:F12}", GPSPtr->northing);
+		Console::WriteLine("easting: {0:F12}", GPSPtr->easting);
+		Console::WriteLine("height: {0:F12}", GPSPtr->height);
 		return 1;
 	}
 }
 int GPS::sendDataToSharedMemory()
 {
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
-	GPSPtr->northing = NovatelGPS.northing;
-	GPSPtr->easting = NovatelGPS.easting;
-	GPSPtr->height = NovatelGPS.height;
+	SM_GPS* GPSDataPtr = (SM_GPS*)GPSDataObj->pData;
+	GPSDataPtr->northing = GPSPtr->northing;
+	GPSDataPtr->easting = GPSPtr->easting;
+	GPSDataPtr->height = GPSPtr->height;
 	//GPSPtr->numData++;
 	return 1;
 }
