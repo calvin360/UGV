@@ -8,8 +8,6 @@
 unsigned long CRC32Value(int i);
 unsigned long CalculateBlockCRC32(unsigned long ulCount, unsigned char* ucBuffer);
 
-
-
 ref class GPS : public UGV_module
 {
 
