@@ -102,9 +102,9 @@ int GPS::getData()
 			}
 		}
 		//Console::WriteLine(ReadData1);
-		//Console::WriteLine("northing: {0:F12}", NovatelGPS.northing);
-		//Console::WriteLine("easting: {0:F12}", NovatelGPS.easting);
-		//Console::WriteLine("height: {0:F12}", NovatelGPS.height);
+		Console::WriteLine("northing: {0:F12}", GPSPtr->northing);
+		Console::WriteLine("easting: {0:F12}", GPSPtr->easting);
+		Console::WriteLine("height: {0:F12}", GPSPtr->height);
 	}
 
 	return 1;
