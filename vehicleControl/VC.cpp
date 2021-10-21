@@ -8,7 +8,7 @@ using namespace System::Threading;
 
 int VC::connect(String^ hostName, int portNumber)
 {
-	String^ AskScan = gcnew String("sRN LMDscandata");
+	//String^ AskScan = gcnew String("sRN LMDscandata");
 	Client = gcnew TcpClient(hostName, portNumber);
 	Client->NoDelay = true;
 	Client->ReceiveTimeout = 500;//ms
@@ -17,41 +17,40 @@ int VC::connect(String^ hostName, int portNumber)
 	Client->SendBufferSize = 1024;
 	String^ Str = gcnew String("5260528\n");
 	SendData = gcnew array<unsigned char>(16);
-	ReadData = gcnew array<unsigned char>(2500);
+	//ReadData = gcnew array<unsigned char>(2500);
 	NetworkStream^ Stream = Client->GetStream();
 	SendData = System::Text::Encoding::ASCII->GetBytes(Str);
 	Stream->Write(SendData, 0, SendData->Length);
 	System::Threading::Thread::Sleep(10);
-	SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
+	//SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
 	// Read the incoming data
-	Stream->Read(ReadData, 0, ReadData->Length);
+	//Stream->Read(ReadData, 0, ReadData->Length);
 	// Convert incoming data from an array of unsigned char bytes to an ASCII string
-	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
+	//ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	// Print the received string on the screen
-	Console::WriteLine(ResponseData);
+	//Console::WriteLine(ResponseData);
 	return 1;
 }
 int VC::setupSharedMemory()
 {
 	//SM for timestamps
 	tObj = new SMObject(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
-	tObj->SMCreate();
+	//tObj->SMCreate();
 	tObj->SMAccess();
-	timeStamps* timePtr = (timeStamps*)tObj->pData;
+	//timeStamps* timePtr = (timeStamps*)tObj->pData;
 	//SM for PM
 	PMObj = new SMObject(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-	PMObj->SMCreate();
+	//PMObj->SMCreate();
 	PMObj->SMAccess();
-	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
-	LsObj = new SMObject(_TEXT("SM_VC"), sizeof(SM_Laser));
-	LsObj->SMCreate();
-	LsObj->SMAccess();
-	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
+	//ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
+	VCObj = new SMObject(_TEXT("SM_VehicleControl"), sizeof(SM_VehicleControl));
+	//LsObj->SMCreate();
+	VCObj->SMAccess();
 	return 1;
 }
 int VC::getData()
 {
-	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
+	SM_VehicleControl* VCPtr = (SM_VehicleControl*)LsObj->pData;
 	// Write command asking for data
 	NetworkStream^ Stream = Client->GetStream();
 	Stream->WriteByte(0x02);
@@ -67,7 +66,7 @@ int VC::getData()
 	StringArray = ResponseData->Split(' ');
 	StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
-	LsPtr->num = System::Convert::ToInt32(StringArray[25], 16);
+	//VCPtr->num = System::Convert::ToInt32(StringArray[25], 16);
 	return 1;
 }
 int VC::checkData()

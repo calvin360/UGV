@@ -86,6 +86,7 @@ ref class UGV_module
 		SMObject* LsObj;
 		SMObject* GPSObj;
 		SMObject* GPSDataObj;
+		SMObject* VCObj;
 };
 
 #endif 

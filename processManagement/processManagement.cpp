@@ -7,7 +7,7 @@
 #include <iostream>
 #include <conio.h>
 
-#include "smstructs.h"
+#include <smstructs.h>
 #include <SMObject.h>
 
 using namespace System;
@@ -28,40 +28,48 @@ TCHAR Units[10][20] = //
 TEXT("VehicleControl.exe"),
 TEXT("Display5.exe"),
 TEXT("LASER4.exe"),
-TEXT("GPS3.exe"),
+TEXT("GPS4.exe"),
 TEXT("Camera.exe")
 };
 
 int main()
 {
-	//setup shared memory
+	//SM for timestamp
 	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
 	tObj.SMCreate();
 	tObj.SMAccess();
 	timeStamps* timePtr = (timeStamps*)tObj.pData;
+	//SM for process management
 	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
 	PMObj.SMCreate();
 	PMObj.SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj.pData;
+	//SM for laser
 	SMObject LsObj(_TEXT("SM_Laser"), sizeof(SM_Laser));
 	LsObj.SMCreate();
 	LsObj.SMAccess();
+	//SM for VC
+	SMObject VcObj(_TEXT("SM_VehicleControl"), sizeof(SM_VehicleControl));
+	VcObj.SMCreate();
+	VcObj.SMAccess();
+	//SM for GPS data
+	SMObject GPSDataObj(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
+	GPSDataObj.SMCreate();
+	GPSDataObj.SMAccess();
 	PMSMPtr->Heartbeat.Status = 0x07; //set low by default 
 	//wait time for unresponsive processes (seconds)
 	PMSMPtr->LifeCounter = 3;
 	timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 	//start all 5 modules
 	StartProcesses();
-	Sleep(10);
+	Sleep(1000);
 	//PMSMPtr->LifeCounter = 1;
 	while (!_kbhit()) {
 		timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
-		//Console::WriteLine("PM time stamp    : {0,12:F3} {1,12:X8}", timePtr->PM, PMSMPtr->Shutdown.Status);
-		//Console::WriteLine("Laser time stamp    : {0,12:F3} {1,12:X8}", timePtr->Laser, PMSMPtr->Shutdown.Status);
-		//Console::WriteLine("GPS time stamp    : {0,12:F3} {1,12:X8}", timePtr->GPS, PMSMPtr->Shutdown.Status);
-		//Console::WriteLine("Life    : {0,12:F3} {1,12:X8}", (timePtr->PM - timePtr->Display), PMSMPtr->Shutdown.Status);
-		if (IsProcessRunning("Camera") == true)
-			Console::WriteLine("dfviodfnipbnipsbd");
+		Console::WriteLine("PM time stamp    : {0,12:F3} {1,12:X8}", timePtr->PM, PMSMPtr->Shutdown.Status);
+		Console::WriteLine("Laser time stamp    : {0,12:F3} {1,12:X8}", timePtr->Laser, PMSMPtr->Shutdown.Status);
+		Console::WriteLine("GPS time stamp    : {0,12:F3} {1,12:X8}", timePtr->GPS, PMSMPtr->Shutdown.Status);
+		Console::WriteLine("Life    : {0,12:F3} {1,12:X8}", (timePtr->PM - timePtr->Display), PMSMPtr->Shutdown.Status);
 		Sleep(100);
 		//checking crit processes
 		if ((CRITICALMASK & PMSMPtr->Heartbeat.Status) == CRITICALMASK) {

@@ -46,6 +46,7 @@ struct SM_GPSData
 	double northing;
 	double easting;
 	double height;
+	double numData;
 };
 
 struct UnitFlags

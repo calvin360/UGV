@@ -61,6 +61,7 @@ void motion(int x, int y);
 
 void drawLaser();
 void addLine(double x, double y);
+void drawGPS();
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -83,8 +84,12 @@ double steering = 0;
 timeStamps* time1;
 ProcessManagement* PM;
 //SM_Laser* Ls;
+SM_VehicleControl* VC;
+SM_GPSData* GPS;
 	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));
 	SMObject PMObj(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+	SMObject VCObj(_TEXT("SM_VehicleControl"), sizeof(SM_VehicleControl));
+	SMObject GPSDataObj(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
 	SMObject* LsObj;
 
 //int _tmain(int argc, _TCHAR* argv[]) {
@@ -105,6 +110,11 @@ int main(int argc, char ** argv) {
 	PMObj.SMAccess();
 	PMSMPtr = (ProcessManagement*)PMObj.pData;
 	PM = PMSMPtr;
+	VCObj.SMAccess();
+	VC = (SM_VehicleControl*)VCObj.pData;
+	GPSDataObj.SMAccess();
+	GPS = (SM_GPSData*)GPSDataObj.pData;
+
 	//LsObj->SMCreate();
 	//LsObj->SMAccess();
 	//Ls = (SM_Laser*)LsObj->pData;
@@ -183,6 +193,7 @@ void display() {
 	// draw HUD
 	HUD::Draw();
 	drawLaser();
+	drawGPS();
 
 	glutSwapBuffers();
 	//Sleep(10000);
@@ -216,6 +227,7 @@ double getTime()
 }
 
 void idle() {
+	VC = (SM_VehicleControl*)VCObj.pData;
 	if (PM->Heartbeat.Flags.Display == 0) {
 			PM->Heartbeat.Flags.Display = 1;
 			Console::WriteLine("display reset");
@@ -276,7 +288,8 @@ void idle() {
 	if (KeyManager::get()->isSpecialKeyPressed(GLUT_KEY_DOWN)) {
 		speed = Vehicle::MAX_BACKWARD_SPEED_MPS;
 	}
-
+	VC->Speed = speed;
+	VC->Steering = steering;
 
 
 
@@ -381,4 +394,19 @@ void drawLaser() {
 void addLine(double x, double y) {
 	glVertex3f(x, 0.3, y);
 	glVertex3f(x, 1.0, y);
+}
+
+void drawGPS() {
+	//SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
+	glPushMatrix();
+	vehicle->positionInGL();
+	glTranslated(0.5, 0, 0); // move reference frame to lidar
+	glLineWidth(2.5);
+	glColor3f(0.0, 1.0, 1.0);
+	glBegin(GL_LINES);
+	addLine(GPS->northing, GPS->easting);
+	//for (int i = 0; i < GPS->numData; i++) {
+	//}
+	glEnd();
+	glPopMatrix();
 }

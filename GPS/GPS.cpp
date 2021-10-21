@@ -53,24 +53,24 @@ int GPS::setupSharedMemory()
 {
 	//SM for timestamps
 	tObj = new SMObject(_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
-	tObj->SMCreate();
+	//tObj->SMCreate();
 	tObj->SMAccess();
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	//SM for PM
 	PMObj = new SMObject(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-	PMObj->SMCreate();
+	//PMObj->SMCreate();
 	PMObj->SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	//SM for GPS 
 	GPSObj = new SMObject(_TEXT("SM_GPS"), sizeof(SM_GPS));
-	GPSObj->SMCreate();
+	//GPSObj->SMCreate();
 	GPSObj->SMAccess();
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	//SM for GPS data
 	GPSDataObj = new SMObject(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
-	GPSDataObj->SMCreate();
+	//GPSDataObj->SMCreate();
 	GPSDataObj->SMAccess();
-	SM_GPS* GPSDataPtr = (SM_GPS*)GPSDataObj->pData;
+	SM_GPSData* GPSDataPtr = (SM_GPSData*)GPSDataObj->pData;
 	return 1;
 }
 int GPS::getData()
@@ -132,11 +132,11 @@ int GPS::checkData()
 int GPS::sendDataToSharedMemory()
 {
 	SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
-	SM_GPS* GPSDataPtr = (SM_GPS*)GPSDataObj->pData;
+	SM_GPSData* GPSDataPtr = (SM_GPSData*)GPSDataObj->pData;
 	GPSDataPtr->northing = GPSPtr->northing;
 	GPSDataPtr->easting = GPSPtr->easting;
 	GPSDataPtr->height = GPSPtr->height;
-	//GPSPtr->numData++;
+	GPSDataPtr->numData++;
 	return 1;
 }
 bool GPS::getShutdownFlag()
