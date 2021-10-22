@@ -96,8 +96,10 @@ void idle()
 		Console::WriteLine("PM died");
 		exit(-1);
 	}
-	else if (_kbhit())
+	else if (_kbhit()) {
+		Console::WriteLine("Shutdown");
 		exit(-1);
+	}
 
 	//receive from zmq
 	zmq::message_t update;

@@ -62,6 +62,8 @@ void motion(int x, int y);
 void drawLaser();
 void addLine(double x, double y);
 void drawGPS();
+void renderString(const char* str, int x, int y, void* font);
+const char* ConvertDoubleToString(double value);
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -102,11 +104,11 @@ int main(int argc, char ** argv) {
 	timeStamps* timePtr = nullptr;
 	ProcessManagement* PMSMPtr = nullptr;
 	//SM_Laser* LsPtr = nullptr;
-	//tObj.SMCreate();
+	tObj.SMCreate();
 	tObj.SMAccess();
 	timePtr = (timeStamps*)tObj.pData;
 	time1 = timePtr;
-	//PMObj.SMCreate();
+	PMObj.SMCreate();
 	PMObj.SMAccess();
 	PMSMPtr = (ProcessManagement*)PMObj.pData;
 	PM = PMSMPtr;
@@ -385,7 +387,7 @@ void drawLaser() {
 	glBegin(GL_LINES);
 	for (int i = 0; i < Ls->num; i++) {
 		addLine(Ls->x[i] / 1000.0, Ls->y[i] / 1000.0);
-		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, Ls->x[i], Ls->y[i]);
+		//Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, Ls->x[i], Ls->y[i]);
 	}
 	glEnd();
 	glPopMatrix();
@@ -397,16 +399,32 @@ void addLine(double x, double y) {
 }
 
 void drawGPS() {
-	//SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
+	SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
 	glPushMatrix();
-	vehicle->positionInGL();
-	glTranslated(0.5, 0, 0); // move reference frame to lidar
-	glLineWidth(2.5);
-	glColor3f(0.0, 1.0, 1.0);
-	glBegin(GL_LINES);
-	addLine(GPS->northing, GPS->easting);
-	//for (int i = 0; i < GPS->numData; i++) {
-	//}
-	glEnd();
+
+	//glTranslatef(100, 100, 0);
+	//glDisable(GL_LIGHTING);
+	char northing[50];
+	sprintf(northing, "Northing: %lf", GPS->northing);
+	//Console::WriteLine(northing);
+	//Console::WriteLine(northing);
+	printf("%s\n", northing);
+	renderString(northing,100,100, GLUT_BITMAP_HELVETICA_12);
+
 	glPopMatrix();
+}
+
+void renderString(const char* str, int x, int y, void* font) {
+	for (int i = 0; i < strlen(str); i++) {
+		glRasterPos2i(x, y);
+		glutBitmapCharacter(font, str[i]);
+		x += glutBitmapWidth(font, str[i]);
+	}
+}
+
+const char* ConvertDoubleToString(double value) {
+	std::stringstream ss;
+	ss << value;
+	const char* str = ss.str().c_str();
+	return str;
 }

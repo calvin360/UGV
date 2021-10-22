@@ -25,11 +25,11 @@ void print(ProcessManagement* PMSMPtr);
 //defining start up sequence
 TCHAR Units[10][20] = //
 {
-TEXT("VehicleControl.exe"),
-TEXT("Display5.exe"),
-TEXT("LASER4.exe"),
-TEXT("GPS4.exe"),
-TEXT("Camera.exe")
+TEXT("Display6.exe"),
+TEXT("Camera.exe"),
+TEXT("LASER6.exe"),
+TEXT("vehicleControl1.exe"),
+TEXT("GPS10.exe")
 };
 
 int main()

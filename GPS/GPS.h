@@ -7,18 +7,18 @@
 
 unsigned long CRC32Value(int i);
 unsigned long CalculateBlockCRC32(unsigned long ulCount, unsigned char* ucBuffer);
-#pragma pack(push,1)
-struct SM_GPS
-{
-	unsigned int Header;
-	unsigned char Discards1[40];
-	double northing;
-	double easting;
-	double height;
-	unsigned char Discards2[40];
-	unsigned int checkSum;
-};
-#pragma pack(pop,1)
+//#pragma pack(1)
+//struct SM_GPS
+//{
+//	unsigned int Header;
+//	unsigned char Discards1[40];
+//	double northing;
+//	double easting;
+//	double height;
+//	unsigned char Discards2[40];
+//	unsigned int checkSum;
+//};
+////#pragma pack(pop,1)
 ref class GPS : public UGV_module
 {
 

@@ -36,16 +36,16 @@ int Laser::setupSharedMemory()
 {
 	//SM for timestamps
 	tObj = new SMObject (_TEXT("timeStamps"), sizeof(timeStamps));//declaring SM
-	//tObj->SMCreate();
+	tObj->SMCreate();
 	tObj->SMAccess();
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
 	//SM for PM
 	PMObj = new SMObject (_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-	//PMObj->SMCreate();
+	PMObj->SMCreate();
 	PMObj->SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	LsObj = new SMObject (_TEXT("SM_Laser"), sizeof(SM_Laser));
-	//LsObj->SMCreate();
+	LsObj->SMCreate();
 	LsObj->SMAccess();
 	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
 	return 1;
@@ -59,13 +59,16 @@ int Laser::getData()
 	Stream->Write(SendData, 0, SendData->Length);
 	Stream->WriteByte(0x03);
 	// Wait for the server to prepare the data, 1 ms would be sufficient, but used 10 ms
-	System::Threading::Thread::Sleep(10);
+	System::Threading::Thread::Sleep(20);
 	// Read the incoming data
 	Stream->Read(ReadData, 0, ReadData->Length);
 	// Convert incoming data from an array of unsigned char bytes to an ASCII string
 	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	// Print the received string on the screen
 	StringArray = ResponseData->Split(' ');
+	for (int i = 0; i < StringArray->Length; i++) {
+		Console::WriteLine(StringArray[i]);
+	}
 	StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
 	LsPtr->num = System::Convert::ToInt32(StringArray[25], 16);

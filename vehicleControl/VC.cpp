@@ -8,6 +8,7 @@ using namespace System::Threading;
 
 int VC::connect(String^ hostName, int portNumber)
 {
+	Console::WriteLine("Connecting");
 	//String^ AskScan = gcnew String("sRN LMDscandata");
 	Client = gcnew TcpClient(hostName, portNumber);
 	Client->NoDelay = true;
@@ -20,7 +21,7 @@ int VC::connect(String^ hostName, int portNumber)
 	//ReadData = gcnew array<unsigned char>(2500);
 	NetworkStream^ Stream = Client->GetStream();
 	SendData2 = System::Text::Encoding::ASCII->GetBytes(Str);
-	Stream->Write(SendData, 0, SendData->Length);
+	Stream->Write(SendData2, 0, SendData2->Length);
 	flag = 0;
 	//System::Threading::Thread::Sleep(10);
 	//SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
@@ -48,7 +49,7 @@ int VC::setupSharedMemory()
 }
 int VC::getData()
 {
-	SM_VehicleControl* VCPtr = (SM_VehicleControl*)LsObj->pData;
+	SM_VehicleControl* VCPtr = (SM_VehicleControl*)VCObj->pData;
 	// Write command asking for data
 	NetworkStream^ Stream = Client->GetStream();
 	//Stream->WriteByte(0x02);
@@ -68,13 +69,12 @@ int VC::getData()
 
 	String^ Control = gcnew String("#" + VCPtr->Steering.ToString("f2") + " " + VCPtr->Speed.ToString("f2") + flag + "#");
 	Console::WriteLine(Control);
-	SendData2= System::Text::Encoding::ASCII->GetBytes(Control);
-	Stream->Write(SendData2, 0, SendData2->Length);
+	SendData2 = System::Text::Encoding::ASCII->GetBytes(Control);
 	return 1;
 }
 int VC::checkData()
 {
-	SM_VehicleControl* VCPtr = (SM_VehicleControl*)LsObj->pData;
+	SM_VehicleControl* VCPtr = (SM_VehicleControl*)VCObj->pData;
 	if (-1<=VCPtr->Speed<1&&-40<=VCPtr->Steering<=40) {
 		Console::WriteLine("Good data");
 		flag = !flag;
@@ -88,23 +88,24 @@ int VC::checkData()
 }
 int VC::sendDataToSharedMemory()
 {
-	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
-	array<double>^ Range = gcnew array<double>(LsPtr->num);
-	array<double>^ RangeX = gcnew array<double>(LsPtr->num);
-	array<double>^ RangeY = gcnew array<double>(LsPtr->num);
-	for (int i = 0; i < LsPtr->num; i++) {
-		Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
-		LsPtr->x[i] = Range[i] * sin(i * Res * PI / 180);
-		LsPtr->y[i] = Range[i] * cos(i * Res * PI / 180);
-		Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, LsPtr->x[i], LsPtr->y[i]);
-	}
+	//SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
+	//array<double>^ Range = gcnew array<double>(LsPtr->num);
+	//array<double>^ RangeX = gcnew array<double>(LsPtr->num);
+	//array<double>^ RangeY = gcnew array<double>(LsPtr->num);
+	//for (int i = 0; i < LsPtr->num; i++) {
+	//	Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
+	//	LsPtr->x[i] = Range[i] * sin(i * Res * PI / 180);
+	//	LsPtr->y[i] = Range[i] * cos(i * Res * PI / 180);
+	//	Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, LsPtr->x[i], LsPtr->y[i]);
+	//}
+	Stream->Write(SendData2, 0, SendData2->Length);
 	return 1;
 }
 bool VC::getShutdownFlag()
 {
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	timeStamps* timePtr = (timeStamps*)tObj->pData;
-	if (PMSMPtr->Shutdown.Status == 0xFF || PMSMPtr->Shutdown.Status == 0x01)
+	if (PMSMPtr->Shutdown.Status == 0xFF || PMSMPtr->Shutdown.Status == 0x08)
 		return 1;
 	if ((timePtr->VehicleControl - timePtr->PM) > (PMSMPtr->LifeCounter)) {
 		Console::WriteLine("PM died");
@@ -127,7 +128,7 @@ VC::~VC()
 {
 	delete tObj;
 	delete PMObj;
-	delete LsObj;
+	delete VCObj;
 	Stream->Close();
 	Client->Close();
 }
