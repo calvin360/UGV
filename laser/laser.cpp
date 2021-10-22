@@ -74,7 +74,7 @@ int Laser::getData()
 int Laser::checkData()
 {
 	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
-	if (StringArray[1] == "LMDscandata"&&LsPtr->num==361) {
+	if (StringArray[1] == "LMDscandata"&&LsPtr->num==361&&StringArray->Length==393) {
 		Console::WriteLine("Good data");
 		Console::WriteLine(StringArray[1]);
 
