@@ -25,11 +25,11 @@ void print(ProcessManagement* PMSMPtr);
 //defining start up sequence
 TCHAR Units[10][20] = //
 {
-TEXT("Display6.exe"),
+TEXT("Display.exe"),
 TEXT("Camera.exe"),
-TEXT("LASER6.exe"),
-TEXT("vehicleControl1.exe"),
-TEXT("GPS10.exe")
+TEXT("LASER.exe"),
+TEXT("vehicleControl.exe"),
+TEXT("GPS.exe")
 };
 
 int main()
@@ -120,7 +120,7 @@ int main()
 			break;
 	}
 	Console::WriteLine("Process management terminated normally.");
-	Sleep(10000);
+	Sleep(5000);
 	return 0;
 }
 
