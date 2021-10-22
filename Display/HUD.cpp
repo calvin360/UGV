@@ -1,6 +1,8 @@
 #include "HUD.hpp"
 #include "Camera.hpp"
 #include "Vehicle.hpp"
+#include <smstructs.h>
+#include <SMObject.h>
 
 #ifdef __APPLE__
 	#include <OpenGL/gl.h>
@@ -28,9 +30,11 @@
 #include <map>
 
 
+
 extern Vehicle * vehicle;
 
 using namespace scos;
+
 
 
 void HUD::RenderString(const char * str, int x, int y, void * font) 
@@ -44,6 +48,10 @@ void HUD::RenderString(const char * str, int x, int y, void * font)
 #define DEGTORAD (3.141592765 / 180.0)
 void HUD::DrawGauge(double x, double y, double r, double min, double max, double val, const char * label, const char * minLabel, const char * maxLabel)
 {
+	SMObject GPSDataObj(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
+	GPSDataObj.SMCreate();
+	GPSDataObj.SMAccess();
+	SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
 	glPushMatrix();
 	double r1 = r;
 	double r2 = r * 1.05;
@@ -69,6 +77,17 @@ void HUD::DrawGauge(double x, double y, double r, double min, double max, double
 		glVertex2f(r2 * x, r2 * y);
 	}
 	glEnd();
+
+	char northing[50];
+	char easting[50];
+	char height[50];
+	sprintf(northing, "Northing: %lf", GPS->northing);
+	sprintf(easting, "Easting: %lf", GPS->easting);
+	sprintf(height, "Height: %lf", GPS->height);
+	RenderString(northing, (r2 + 5) * cos(startR * DEGTORAD) - 8, (r2 + 5) * sin(startR * DEGTORAD), GLUT_BITMAP_HELVETICA_12);
+	RenderString(easting, (r2 + 5) * cos(startR * DEGTORAD) - 8, (r2 + 5) * sin(startR * DEGTORAD), GLUT_BITMAP_HELVETICA_12);
+	RenderString(height, (r2 + 5) * cos(startR * DEGTORAD) - 8, (r2 + 5) * sin(startR * DEGTORAD), GLUT_BITMAP_HELVETICA_12);
+
 
 	// labels
 	char buff[80];
@@ -140,6 +159,10 @@ void HUD::DrawGauge(double x, double y, double r, double min, double max, double
 
 void HUD::Draw()
 {
+	SMObject GPSDataObj(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
+	GPSDataObj.SMCreate();
+	GPSDataObj.SMAccess();
+	SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
 	Camera::get()->switchTo2DDrawing();
 	int winWidthOff = (Camera::get()->getWindowWidth() - 800) * .5;
 	if(winWidthOff < 0)
@@ -150,6 +173,15 @@ void HUD::Draw()
 		DrawGauge(200+winWidthOff, 280, 210, -1, 1, vehicle->getSpeed(), "Speed");
 		glColor3f(1, 1, 0);
 		DrawGauge(600+winWidthOff, 280, 210, -40, 40, vehicle->getSteering(), "Steer");
+		char northing[50];
+		char easting[50];
+		char height[50];
+		sprintf(northing, "Northing: %lf", GPS->northing);
+		sprintf(easting, "Easting: %lf", GPS->easting);
+		sprintf(height, "Height: %lf", GPS->height);
+		RenderString(northing, 200 + winWidthOff, 280, GLUT_BITMAP_HELVETICA_12);
+		RenderString(easting, 210 + winWidthOff, 280, GLUT_BITMAP_HELVETICA_12);
+		RenderString(height, 220 + winWidthOff, 280, GLUT_BITMAP_HELVETICA_12);
 	}
 
 	Camera::get()->switchTo3DDrawing();

@@ -403,13 +403,21 @@ void drawGPS() {
 	glPushMatrix();
 
 	//glTranslatef(100, 100, 0);
-	//glDisable(GL_LIGHTING);
-	char northing[50];
-	sprintf(northing, "Northing: %lf", GPS->northing);
-	//Console::WriteLine(northing);
-	//Console::WriteLine(northing);
-	printf("%s\n", northing);
-	renderString(northing,100,100, GLUT_BITMAP_HELVETICA_12);
+	////glDisable(GL_LIGHTING);
+	//char northing[50];
+	//char easting[50];
+	//char height[50];
+	//sprintf(northing, "Northing: %lf", GPS->northing);
+	//sprintf(easting, "Easting: %lf", GPS->easting);
+	//sprintf(height, "Height: %lf", GPS->height);
+	////Console::WriteLine(northing);
+	////Console::WriteLine(northing);
+	//printf("%s\n", northing);
+	//printf("%s\n", easting);
+	//printf("%s\n", height);
+	//renderString(northing,100,100, GLUT_BITMAP_HELVETICA_12);
+	//renderString(easting, 100, 100, GLUT_BITMAP_HELVETICA_12);
+	//renderString(height, 100, 100, GLUT_BITMAP_HELVETICA_12);
 
 	glPopMatrix();
 }
