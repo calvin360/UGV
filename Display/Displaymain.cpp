@@ -412,9 +412,9 @@ void drawGPS() {
 
 	glTranslatef(100, 100, 0);
 	//glDisable(GL_LIGHTING);
-	char *northing = NULL;
-	char *easting = NULL;
-	char *height = NULL;
+	char northing[50];
+	char easting[50];
+	char height[50];
 	sprintf(northing, "Northing: %lf", GPS->northing);
 	sprintf(easting, "Easting: %lf", GPS->easting);
 	sprintf(height, "Height: %lf", GPS->height);
@@ -423,7 +423,7 @@ void drawGPS() {
 	printf("%s\n", northing);
 	printf("%s\n", easting);
 	printf("%s\n", height);
-	renderString(northing, 200 + winWidthOff,100, GLUT_BITMAP_HELVETICA_12);
+	renderString(northing, 25 + winWidthOff,25, GLUT_BITMAP_HELVETICA_12);
 	renderString(easting, 200 + winWidthOff, 100, GLUT_BITMAP_HELVETICA_12);
 	renderString(height, 200 + winWidthOff, 100, GLUT_BITMAP_HELVETICA_12);
 
