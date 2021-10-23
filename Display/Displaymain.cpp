@@ -292,7 +292,6 @@ void idle() {
 	}
 
 
-
 	const float sleep_time_between_frames_in_seconds = 0.025;
 
 	static double previousTime = getTime();
@@ -305,10 +304,6 @@ void idle() {
 		vehicle->update(speed, steering, elapsedTime);
 		VC->Speed = speed;
 		VC->Steering = steering;
-		Console::WriteLine(speed);
-		Console::WriteLine(steering);
-		printf("%lf\n", speed);
-		printf("%lf\n", steering);
 	}
 	display();
 	//Sleep(9000);
@@ -436,11 +431,4 @@ void renderString(const char* str, int x, int y, void* font) {
 		glutBitmapCharacter(font, str[i]);
 		x += glutBitmapWidth(font, str[i]);
 	}
-}
-
-const char* ConvertDoubleToString(double value) {
-	std::stringstream ss;
-	ss << value;
-	const char* str = ss.str().c_str();
-	return str;
 }

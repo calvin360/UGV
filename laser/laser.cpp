@@ -66,9 +66,9 @@ int Laser::getData()
 	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	// Print the received string on the screen
 	StringArray = ResponseData->Split(' ');
-	for (int i = 0; i < StringArray->Length; i++) {
-		Console::WriteLine(StringArray[i]);
-	}
+	//for (int i = 0; i < StringArray->Length; i++) {
+	//	Console::WriteLine(StringArray[i]);
+	//}
 	StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
 	LsPtr->num = System::Convert::ToInt32(StringArray[25], 16);

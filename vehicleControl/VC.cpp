@@ -10,18 +10,18 @@ int VC::connect(String^ hostName, int portNumber)
 {
 	Console::WriteLine("Connecting");
 	//String^ AskScan = gcnew String("sRN LMDscandata");
-	Client = gcnew TcpClient(hostName, portNumber);
-	Client->NoDelay = true;
-	Client->ReceiveTimeout = 500;//ms
-	Client->SendTimeout = 500;//ms
-	Client->ReceiveBufferSize = 1024;
-	Client->SendBufferSize = 1024;
+	VCClient = gcnew TcpClient(hostName, portNumber);
+	VCClient->NoDelay = true;
+	VCClient->ReceiveTimeout = 500;//ms
+	VCClient->SendTimeout = 500;//ms
+	VCClient->ReceiveBufferSize = 1024;
+	VCClient->SendBufferSize = 1024;
 	String^ Str = gcnew String("5260528\n");
 	SendData2 = gcnew array<unsigned char>(16);
 	//ReadData = gcnew array<unsigned char>(2500);
-	NetworkStream^ Stream = Client->GetStream();
+	NetworkStream^ VCStream = VCClient->GetStream();
 	SendData2 = System::Text::Encoding::ASCII->GetBytes(Str);
-	Stream->Write(SendData2, 0, SendData2->Length);
+	VCStream->Write(SendData2, 0, SendData2->Length);
 	flag = 0;
 	//System::Threading::Thread::Sleep(10);
 	//SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
@@ -51,7 +51,6 @@ int VC::getData()
 {
 	SM_VehicleControl* VCPtr = (SM_VehicleControl*)VCObj->pData;
 	// Write command asking for data
-	NetworkStream^ Stream = Client->GetStream();
 	//Stream->WriteByte(0x02);
 	//Stream->Write(SendData, 0, SendData->Length);
 	//Stream->WriteByte(0x03);
@@ -70,12 +69,14 @@ int VC::getData()
 	String^ Control = gcnew String("#" + VCPtr->Steering.ToString("f2") + " " + VCPtr->Speed.ToString("f2") + flag + "#");
 	Console::WriteLine(Control);
 	SendData2 = System::Text::Encoding::ASCII->GetBytes(Control);
+	//Console::WriteLine(SendData2);
 	return 1;
 }
 int VC::checkData()
 {
 	SM_VehicleControl* VCPtr = (SM_VehicleControl*)VCObj->pData;
-	if (-1<=VCPtr->Speed<1&&-40<=VCPtr->Steering<=40) {
+	double speed = VCPtr->Speed;
+	if ((-1<=VCPtr->Speed<=1)&&(-40<=VCPtr->Steering<=40)){
 		Console::WriteLine("Good data");
 		flag = !flag;
 		Sleep(100);
@@ -98,7 +99,8 @@ int VC::sendDataToSharedMemory()
 	//	LsPtr->y[i] = Range[i] * cos(i * Res * PI / 180);
 	//	Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, LsPtr->x[i], LsPtr->y[i]);
 	//}
-	Stream->Write(SendData2, 0, SendData2->Length);
+	NetworkStream^ VCStream = VCClient->GetStream();
+	VCStream->Write(SendData2, 0, SendData2->Length);
 	return 1;
 }
 bool VC::getShutdownFlag()
@@ -130,7 +132,7 @@ VC::~VC()
 	delete PMObj;
 	delete VCObj;
 	Stream->Close();
-	Client->Close();
+	VCClient->Close();
 }
 
 

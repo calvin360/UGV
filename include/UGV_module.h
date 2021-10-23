@@ -78,6 +78,8 @@ ref class UGV_module
 		array<unsigned char>^ SendData1;
 		array<unsigned char>^ ReadData1;
 		//VC
+		TcpClient^ VCClient;
+		NetworkStream^ VCStream;
 		array<unsigned char>^ SendData2;
 		
 		SMObject* tObj;					// Filled in setupSharedMemory(). For accessing PM shared Memory
