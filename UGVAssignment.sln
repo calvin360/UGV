@@ -5,15 +5,15 @@ VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "processManagement5", "processManagement\processManagement.vcxproj", "{2FC62B59-C382-44B8-9A8E-CB7A0668833C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPS10", "GPS\GPS.vcxproj", "{1D14485A-E289-42F3-8107-314177527484}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPS", "GPS\GPS.vcxproj", "{1D14485A-E289-42F3-8107-314177527484}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "camera", "camera\camera.vcxproj", "{4A56A853-D4AC-4075-AA33-86CB27D9E516}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "display6", "Display\Display.vcxproj", "{D050997E-CD03-47CF-B534-A631C5222DF5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "laser6", "laser\laser.vcxproj", "{ACD87187-A167-4692-95AB-EBBEAAC46CCA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "laser", "laser\laser.vcxproj", "{ACD87187-A167-4692-95AB-EBBEAAC46CCA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vehicleControl1", "vehicleControl\vehicleControl.vcxproj", "{91CF9A73-7474-4717-9AC1-534780A17786}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vehicleControl", "vehicleControl\vehicleControl.vcxproj", "{91CF9A73-7474-4717-9AC1-534780A17786}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +31,8 @@ Global
 		{2FC62B59-C382-44B8-9A8E-CB7A0668833C}.Release|x64.Build.0 = Release|x64
 		{2FC62B59-C382-44B8-9A8E-CB7A0668833C}.Release|x86.ActiveCfg = Release|Win32
 		{2FC62B59-C382-44B8-9A8E-CB7A0668833C}.Release|x86.Build.0 = Release|Win32
-		{1D14485A-E289-42F3-8107-314177527484}.Debug|x64.ActiveCfg = Debug|Win32
-		{1D14485A-E289-42F3-8107-314177527484}.Debug|x64.Build.0 = Debug|Win32
+		{1D14485A-E289-42F3-8107-314177527484}.Debug|x64.ActiveCfg = Debug|x64
+		{1D14485A-E289-42F3-8107-314177527484}.Debug|x64.Build.0 = Debug|x64
 		{1D14485A-E289-42F3-8107-314177527484}.Debug|x86.ActiveCfg = Debug|Win32
 		{1D14485A-E289-42F3-8107-314177527484}.Debug|x86.Build.0 = Debug|Win32
 		{1D14485A-E289-42F3-8107-314177527484}.Release|x64.ActiveCfg = Release|x64
@@ -55,8 +55,8 @@ Global
 		{D050997E-CD03-47CF-B534-A631C5222DF5}.Release|x64.Build.0 = Release|x64
 		{D050997E-CD03-47CF-B534-A631C5222DF5}.Release|x86.ActiveCfg = Release|Win32
 		{D050997E-CD03-47CF-B534-A631C5222DF5}.Release|x86.Build.0 = Release|Win32
-		{ACD87187-A167-4692-95AB-EBBEAAC46CCA}.Debug|x64.ActiveCfg = Debug|Win32
-		{ACD87187-A167-4692-95AB-EBBEAAC46CCA}.Debug|x64.Build.0 = Debug|Win32
+		{ACD87187-A167-4692-95AB-EBBEAAC46CCA}.Debug|x64.ActiveCfg = Debug|x64
+		{ACD87187-A167-4692-95AB-EBBEAAC46CCA}.Debug|x64.Build.0 = Debug|x64
 		{ACD87187-A167-4692-95AB-EBBEAAC46CCA}.Debug|x86.ActiveCfg = Debug|Win32
 		{ACD87187-A167-4692-95AB-EBBEAAC46CCA}.Debug|x86.Build.0 = Debug|Win32
 		{ACD87187-A167-4692-95AB-EBBEAAC46CCA}.Release|x64.ActiveCfg = Release|x64

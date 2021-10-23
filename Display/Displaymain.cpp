@@ -309,7 +309,6 @@ void idle() {
 		Console::WriteLine(steering);
 		printf("%lf\n", speed);
 		printf("%lf\n", steering);
-		printf("dsinkdgpibkfbfopbfgobxfibxop\n");
 	}
 	display();
 	//Sleep(9000);
@@ -404,30 +403,31 @@ void addLine(double x, double y) {
 }
 
 void drawGPS() {
-	SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
-	glPushMatrix();
-	int winWidthOff = (Camera::get()->getWindowWidth() - 800) * .5;
-	if (winWidthOff < 0)
-		winWidthOff = 0;
+	//refer to HUD.cpp
+	//SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
+	//char northing[50];
+	//char easting[50];
+	//char height[50];
+	//sprintf(northing, "Northing: %lf", GPS->northing);
+	//sprintf(easting, "Easting: %lf", GPS->easting);
+	//sprintf(height, "Height: %lf", GPS->height);
+	////Console::WriteLine(northing);
+	//Console::WriteLine("asfbwibwoawvbsvbeouhioefghfsdoigheriohovbudogbdfuobdboejsdpjvsidpfhopbvhiobnripgninvionv");
+	//printf("%s\n", northing);
+	//printf("%s\n", easting);
+	//printf("%s\n", height);
+	//int winWidthOff = (Camera::get()->getWindowWidth() - 800) * .5;
+	//if (winWidthOff < 0)
+	//	winWidthOff = 0;
+	//glPushMatrix();
 
-	glTranslatef(100, 100, 0);
-	//glDisable(GL_LIGHTING);
-	char northing[50];
-	char easting[50];
-	char height[50];
-	sprintf(northing, "Northing: %lf", GPS->northing);
-	sprintf(easting, "Easting: %lf", GPS->easting);
-	sprintf(height, "Height: %lf", GPS->height);
-	//Console::WriteLine(northing);
-	//Console::WriteLine(northing);
-	printf("%s\n", northing);
-	printf("%s\n", easting);
-	printf("%s\n", height);
-	renderString(northing, 25 + winWidthOff,25, GLUT_BITMAP_HELVETICA_12);
-	renderString(easting, 200 + winWidthOff, 100, GLUT_BITMAP_HELVETICA_12);
-	renderString(height, 200 + winWidthOff, 100, GLUT_BITMAP_HELVETICA_12);
+	//glTranslatef(100, 100, 0);
+	////glDisable(GL_LIGHTING);
+	//renderString(northing, 25 + winWidthOff,25, GLUT_BITMAP_HELVETICA_12);
+	//renderString(easting, 200 + winWidthOff, 100, GLUT_BITMAP_HELVETICA_12);
+	//renderString(height, 200 + winWidthOff, 100, GLUT_BITMAP_HELVETICA_12);
 
-	glPopMatrix();
+	//glPopMatrix();
 }
 
 void renderString(const char* str, int x, int y, void* font) {

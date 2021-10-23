@@ -123,9 +123,6 @@ int GPS::checkData()
 	//Console::Write("CRC: {0,8:X5}, {1,8:X5}", CRC,calcCRC);
 	if (CRC == calcCRC) {
 		// Print GPS data
-		Console::Write("northing: {0,8:N3}\t", NovatelGPS.northing);
-		Console::Write("easting: {0,9:N3}\t", NovatelGPS.easting);
-		Console::Write("height: {0,10:N3}\t", NovatelGPS.height);
 		Console::Write("checksum: {0,8}\t", CRC);
 		Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
 	}
@@ -138,7 +135,9 @@ int GPS::sendDataToSharedMemory()
 	GPSDataPtr->northing = NovatelGPS.northing;
 	GPSDataPtr->easting = NovatelGPS.easting;
 	GPSDataPtr->height = NovatelGPS.height;
-	GPSDataPtr->numData++;
+	Console::Write("northing: {0,8:N3}\t", GPSDataPtr->northing);
+	Console::Write("easting: {0,9:N3}\t", GPSDataPtr->easting);
+	Console::Write("height: {0,10:N3}\t", GPSDataPtr->height);
 	return 1;
 }
 bool GPS::getShutdownFlag()

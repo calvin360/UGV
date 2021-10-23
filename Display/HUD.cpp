@@ -159,10 +159,10 @@ void HUD::DrawGauge(double x, double y, double r, double min, double max, double
 
 void HUD::Draw()
 {
-//	SMObject GPSDataObj(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
-//	GPSDataObj.SMCreate();
-//	GPSDataObj.SMAccess();
-//	SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
+	SMObject GPSDataObj(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
+	GPSDataObj.SMCreate();
+	GPSDataObj.SMAccess();
+	SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
 	Camera::get()->switchTo2DDrawing();
 	int winWidthOff = (Camera::get()->getWindowWidth() - 800) * .5;
 	if(winWidthOff < 0)
@@ -173,18 +173,19 @@ void HUD::Draw()
 		DrawGauge(200+winWidthOff, 280, 210, -1, 1, vehicle->getSpeed(), "Speed");
 		glColor3f(1, 1, 0);
 		DrawGauge(600+winWidthOff, 280, 210, -40, 40, vehicle->getSteering(), "Steer");
-		//char northing[50];
-		//char easting[50];
-		//char height[50];
+		char northing[50];
+		char easting[50];
+		char height[50];
+		sprintf(northing, "Northing: %lf", GPS->northing);
+		sprintf(easting, "  Easting: %lf", GPS->easting);
+		sprintf(height, "  Height: %lf", GPS->height);
 
-		//sprintf(northing, "Northing: %lf", GPS->northing);
-		//sprintf(easting, "Easting: %lf", GPS->easting);
-		//sprintf(height, "Height: %lf", GPS->height);
-		////strcat(northing, easting);
-		////strcat(northing, height);
-		//RenderString(northing, 200 + winWidthOff, 280, GLUT_BITMAP_HELVETICA_12);
-		//RenderString(easting, 210 + winWidthOff, 280, GLUT_BITMAP_HELVETICA_12);
-		//RenderString(height, 220 + winWidthOff, 280, GLUT_BITMAP_HELVETICA_12);
+		strcat(northing, easting);
+		strcat(northing, height);
+		glColor3f(1, 1, 1);
+		RenderString(northing, 2 + winWidthOff, 15, GLUT_BITMAP_HELVETICA_12);
+		//RenderString(easting, 60 + winWidthOff, 280, GLUT_BITMAP_HELVETICA_12);
+		//RenderString(height, 110 + winWidthOff, 280, GLUT_BITMAP_HELVETICA_12);
 	}
 
 	Camera::get()->switchTo3DDrawing();
