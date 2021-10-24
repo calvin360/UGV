@@ -66,9 +66,6 @@ int Laser::getData()
 	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	// Print the received string on the screen
 	StringArray = ResponseData->Split(' ');
-	//for (int i = 0; i < StringArray->Length; i++) {
-	//	Console::WriteLine(StringArray[i]);
-	//}
 	StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 	Res = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
 	LsPtr->num = System::Convert::ToInt32(StringArray[25], 16);
@@ -79,15 +76,11 @@ int Laser::checkData()
 	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
 	if (StringArray[1] == "LMDscandata"&&LsPtr->num==361&&StringArray->Length==393) {
 		Console::WriteLine("Good data");
-		Console::WriteLine(StringArray[1]);
-
 		Sleep(100);
 		return 1;
 	}
 	else {
 		Console::WriteLine("Bad data");
-		//Console::WriteLine(StringArray[0]);
-		Console::WriteLine(StringArray[1]);
 		Sleep(100);
 		return 0;
 	}
@@ -102,7 +95,6 @@ int Laser::sendDataToSharedMemory()
 		Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
 		LsPtr->x[i] = Range[i] * sin(i * Res * PI / 180);
 		LsPtr->y[i] = Range[i] * cos(i * Res * PI / 180);
-		Console::WriteLine("Range: {0, 12:F3} {1, 12:F3} {2, 12:F3}",i+1, LsPtr->x[i], LsPtr->y[i]);
 	}
 	return 1;
 }
@@ -137,34 +129,3 @@ Laser::~Laser()
 	Stream->Close();
 	Client->Close();
 }
-
-
-//unsigned long CRC32Value(int i)
-//{
-//	int j;
-//	unsigned long ulCRC;
-//	ulCRC = i;
-//	for (j = 8; j > 0; j--)
-//	{
-//		if (ulCRC & 1)
-//			ulCRC = (ulCRC >> 1) ^ CRC32_POLYNOMIAL;
-//		else
-//			ulCRC >>= 1;
-//	}
-//	return ulCRC;
-//}
-//
-//unsigned long CalculateBlockCRC32(unsigned long ulCount, /* Number of bytes in the data block */
-//	unsigned char* ucBuffer) /* Data block */
-//{
-//	unsigned long ulTemp1;
-//	unsigned long ulTemp2;
-//	unsigned long ulCRC = 0;
-//	while (ulCount-- != 0)
-//	{
-//		ulTemp1 = (ulCRC >> 8) & 0x00FFFFFFL;
-//		ulTemp2 = CRC32Value(((int)ulCRC ^ *ucBuffer++) & 0xff);
-//		ulCRC = ulTemp1 ^ ulTemp2;
-//	}
-//	return(ulCRC);
-//}

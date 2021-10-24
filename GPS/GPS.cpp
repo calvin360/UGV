@@ -5,6 +5,7 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 using namespace System::IO::Ports;
 
+//putting GPS data in local struct for processing
 #pragma pack(1)
 struct GPSStruct
 {
@@ -19,7 +20,7 @@ struct GPSStruct
 };
 GPSStruct NovatelGPS;
 unsigned char* BytePtr;
-unsigned char* first;
+
 int GPS::connect(String^ hostName, int portNumber)
 {
 	// Pointer to TcpClent type object on managed heap
@@ -29,25 +30,6 @@ int GPS::connect(String^ hostName, int portNumber)
 	GPSClient->SendTimeout = 500;//ms
 	GPSClient->ReceiveBufferSize = 1024;
 	GPSClient->SendBufferSize = 1024;
-
-	//SerialPort^ Port = nullptr;
-	//String^ PortName = nullptr;
-	//Port = gcnew SerialPort;
-	////PortName = gcnew String("COM1");
-	//SendData = gcnew array<unsigned char>(16);
-	//RecvData = gcnew array<unsigned char>(112);
-	//Port->PortName = gcnew String("COM1");
-	//Port->BaudRate = 115200;
-	//Port->StopBits = StopBits::One;
-	//Port->DataBits = 8;
-	//Port->Parity = Parity::None;
-	//Port->Handshake = Handshake::None;
-	//Port->ReadTimeout = 500;
-	//Port->WriteTimeout = 500;
-	//Port->ReadBufferSize = ;
-	//Port->WriteBufferSize = 1024;
-	//Port->Open();
-	//Port->Read(RecvData, 0, sizeof(SM_GPS));
 
 	return 1;
 }
@@ -63,11 +45,6 @@ int GPS::setupSharedMemory()
 	PMObj->SMCreate();
 	PMObj->SMAccess();
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
-	//SM for GPS 
-	//GPSObj = new SMObject(_TEXT("SM_GPS"), sizeof(SM_GPS));
-	//GPSObj->SMCreate();
-	//GPSObj->SMAccess();
-	//SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	//SM for GPS data
 	GPSDataObj = new SMObject(_TEXT("SM_GPSData"), sizeof(SM_GPSData));
 	GPSDataObj->SMCreate();
@@ -78,7 +55,6 @@ int GPS::setupSharedMemory()
 int GPS::getData()
 {
 	//trap header
-	//SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	NetworkStream^ GPSStream = GPSClient->GetStream();
 	ReadData1 = gcnew array<unsigned char>(sizeof(NovatelGPS) * 2);
 	unsigned int Header = 0;
@@ -94,10 +70,7 @@ int GPS::getData()
 
 		} while (Header != 0xaa44121c);
 		Start = i - 4;
-		//store data
-		//ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
-		//Console::WriteLine(ReadData1);
-		GPSStruct* first = &NovatelGPS;
+		//point to start of good data
 		BytePtr = nullptr;
 		if (Header == 0xaa44121c) {
 			BytePtr = (unsigned char*)&NovatelGPS;
@@ -105,10 +78,6 @@ int GPS::getData()
 				*(BytePtr++) = ReadData1[i];
 			}
 		}
-		//Console::WriteLine(ReadData1);
-		//Console::WriteLine("northing: {0:F8}", NovatelGPS.northing);
-		//Console::WriteLine("easting: {0:F8}", NovatelGPS.easting);
-		//Console::WriteLine("height: {0:F8}", NovatelGPS.height);
 		Sleep(100);
 	}
 
@@ -116,13 +85,9 @@ int GPS::getData()
 }
 int GPS::checkData()
 {
-	//SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
-	
 	unsigned long CRC = (unsigned long)NovatelGPS.checkSum;
 	unsigned long calcCRC = CalculateBlockCRC32(sizeof(NovatelGPS) - sizeof(unsigned int), (unsigned char*)&NovatelGPS);
-	//Console::Write("CRC: {0,8:X5}, {1,8:X5}", CRC,calcCRC);
 	if (CRC == calcCRC) {
-		// Print GPS data
 		Console::Write("checksum: {0,8}\t", CRC);
 		Console::WriteLine("calcCRC: {0,9}\t", calcCRC);
 	}
@@ -130,7 +95,6 @@ int GPS::checkData()
 }
 int GPS::sendDataToSharedMemory()
 {
-	//SM_GPS* GPSPtr = (SM_GPS*)GPSObj->pData;
 	SM_GPSData* GPSDataPtr = (SM_GPSData*)GPSDataObj->pData;
 	GPSDataPtr->northing = NovatelGPS.northing;
 	GPSDataPtr->easting = NovatelGPS.easting;

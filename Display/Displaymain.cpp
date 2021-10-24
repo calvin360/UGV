@@ -62,8 +62,6 @@ void motion(int x, int y);
 void drawLaser();
 void addLine(double x, double y);
 void drawGPS();
-void renderString(const char* str, int x, int y, void* font);
-const char* ConvertDoubleToString(double value);
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -85,7 +83,6 @@ double steering = 0;
 //making SM global
 timeStamps* time1;
 ProcessManagement* PM;
-//SM_Laser* Ls;
 SM_VehicleControl* VC;
 SM_GPSData* GPS;
 	SMObject tObj(_TEXT("timeStamps"), sizeof(timeStamps));
@@ -100,10 +97,8 @@ int main(int argc, char ** argv) {
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
-	//LsObj = new SMObject(_TEXT("SM_Laser"), sizeof(SM_Laser));
 	timeStamps* timePtr = nullptr;
 	ProcessManagement* PMSMPtr = nullptr;
-	//SM_Laser* LsPtr = nullptr;
 	tObj.SMCreate();
 	tObj.SMAccess();
 	timePtr = (timeStamps*)tObj.pData;
@@ -116,11 +111,6 @@ int main(int argc, char ** argv) {
 	VC = (SM_VehicleControl*)VCObj.pData;
 	GPSDataObj.SMAccess();
 	GPS = (SM_GPSData*)GPSDataObj.pData;
-
-	//LsObj->SMCreate();
-	//LsObj->SMAccess();
-	//Ls = (SM_Laser*)LsObj->pData;
-	//Ls = LsPtr;
 
 	glutInit(&argc, (char**)(argv));
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
@@ -198,7 +188,6 @@ void display() {
 	drawGPS();
 
 	glutSwapBuffers();
-	//Sleep(10000);
 };
 
 void reshape(int width, int height) {
@@ -306,7 +295,6 @@ void idle() {
 		VC->Steering = steering;
 	}
 	display();
-	//Sleep(9000);
 #ifdef _WIN32 
 	Sleep(sleep_time_between_frames_in_seconds * 1000);
 #else
@@ -380,13 +368,12 @@ void drawLaser() {
 	SM_Laser* Ls = (SM_Laser*)LsObj.pData;
 	glPushMatrix();
 	vehicle->positionInGL();
-	glTranslated(0.5, 0, 0); // move reference frame to lidar
+	glTranslated(0.5, 0, 0);
 	glLineWidth(1.0);
 	glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_LINES);
 	for (int i = 0; i < Ls->num; i++) {
 		addLine(Ls->x[i] / 1000.0, Ls->y[i] / 1000.0);
-		//Console::WriteLine("range: {0, 12:F3} {1, 12:F3} {2, 12:F3}", i + 1, Ls->x[i], Ls->y[i]);
 	}
 	glEnd();
 	glPopMatrix();
@@ -399,36 +386,4 @@ void addLine(double x, double y) {
 
 void drawGPS() {
 	//refer to HUD.cpp
-	//SM_GPSData* GPS = (SM_GPSData*)GPSDataObj.pData;
-	//char northing[50];
-	//char easting[50];
-	//char height[50];
-	//sprintf(northing, "Northing: %lf", GPS->northing);
-	//sprintf(easting, "Easting: %lf", GPS->easting);
-	//sprintf(height, "Height: %lf", GPS->height);
-	////Console::WriteLine(northing);
-	//Console::WriteLine("asfbwibwoawvbsvbeouhioefghfsdoigheriohovbudogbdfuobdboejsdpjvsidpfhopbvhiobnripgninvionv");
-	//printf("%s\n", northing);
-	//printf("%s\n", easting);
-	//printf("%s\n", height);
-	//int winWidthOff = (Camera::get()->getWindowWidth() - 800) * .5;
-	//if (winWidthOff < 0)
-	//	winWidthOff = 0;
-	//glPushMatrix();
-
-	//glTranslatef(100, 100, 0);
-	////glDisable(GL_LIGHTING);
-	//renderString(northing, 25 + winWidthOff,25, GLUT_BITMAP_HELVETICA_12);
-	//renderString(easting, 200 + winWidthOff, 100, GLUT_BITMAP_HELVETICA_12);
-	//renderString(height, 200 + winWidthOff, 100, GLUT_BITMAP_HELVETICA_12);
-
-	//glPopMatrix();
-}
-
-void renderString(const char* str, int x, int y, void* font) {
-	for (int i = 0; i < strlen(str); i++) {
-		glRasterPos2i(x, y);
-		glutBitmapCharacter(font, str[i]);
-		x += glutBitmapWidth(font, str[i]);
-	}
 }
