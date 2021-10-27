@@ -46,7 +46,7 @@ int Laser::setupSharedMemory()
 	ProcessManagement* PMSMPtr = (ProcessManagement*)PMObj->pData;
 	LsObj = new SMObject (_TEXT("SM_Laser"), sizeof(SM_Laser));
 	LsObj->SMCreate();
-	LsObj->SMAccess();
+	while(LsObj->SMAccess());
 	SM_Laser* LsPtr = (SM_Laser*)LsObj->pData;
 	return 1;
 }

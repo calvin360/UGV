@@ -1,6 +1,5 @@
 #include "VC.h"
 
-#define PI 3.14159265
 
 using namespace System;
 using namespace System::Diagnostics;

@@ -27,9 +27,9 @@ TCHAR Units[10][20] = //
 {
 TEXT("Camera.exe"),
 TEXT("LASER.exe"),
+TEXT("Display7.exe"),
 TEXT("vehicleControl1.exe"),
-TEXT("GPS1.exe"),
-TEXT("Display7.exe")
+TEXT("GPS1.exe")
 };
 
 int main()
@@ -64,7 +64,7 @@ int main()
 	StartProcesses();
 	Sleep(1000);
 	//tighten timing for operation
-	PMSMPtr->LifeCounter = 1;
+	PMSMPtr->LifeCounter = 1.5;
 	while (!_kbhit()) {
 		timePtr->PM = (double)Stopwatch::GetTimestamp() / (double)Stopwatch::Frequency;
 		Console::WriteLine("PM time stamp    : {0,12:F3} {1,12:X8}", timePtr->PM, PMSMPtr->Shutdown.Status);
@@ -122,7 +122,7 @@ int main()
 			break;
 	}
 	Console::WriteLine("Process management terminated normally.");
-	Sleep(5000);
+	Sleep(2000);
 	return 0;
 }
 
